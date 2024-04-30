@@ -11,7 +11,7 @@ export interface MemberData {
   latitude:number;
   longitude:number;
   password:string;
-  organization:string;
+ 
 }
 
 interface TeamMembersContextProps {

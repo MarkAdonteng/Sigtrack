@@ -19,6 +19,11 @@ export default {
         'secondary-text':'rgba(217, 217, 217, 1)',
        
       },
+      fontFamily: {
+        roboto: ['Roboto', 'sans-serif'],
+        openSans: ['Open Sans', 'sans-serif'],
+        lato: ['Lato', 'sans-serif'],
+      },
     },
   },
   plugins: [],

@@ -4,6 +4,7 @@
 
 body{
     overflow:hidden;
+    font-family: 'Lato', sans-seri;
 }
 
 :root {
@@ -133,6 +134,23 @@ img {
       top: 5%;
     }
   }
+
+  .marquee {
+    transition: transform 0.3s ease-in-out; /* Added transition */
+  }
+  
+  .marquee:hover {
+    animation: marquee 10s linear infinite; /* Changed animation to infinite */
+  }
+  
+  @keyframes marquee {
+    0% { transform: translateX(0%); }
+    5% { transform: translateX(-5%); } /* Text vanishes */
+    5% { transform: translateX(5%); } /* Text reappears from behind */
+    100% { transform: translateX(0%); } /* Reset */
+  }
+  
+  
 
 
   

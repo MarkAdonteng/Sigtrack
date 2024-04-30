@@ -8,7 +8,8 @@ import { Member } from './AddMembersButton';
 import {MemberData} from '../Context/TeamMembersContext'
 
 interface TeamMembersProps {
-  formatDate: (date: string | Date) => string;
+  teamMembers: MemberData[];
+  formatDate: (date: string | Date | undefined) => string;
 }
 
 // interface MembersData {
@@ -24,12 +25,14 @@ interface TeamMembersProps {
 //   organization?: string;
 // }
 
+
+
 const TeamMembers: React.FC<TeamMembersProps> = ({ formatDate }) => {
   const { teamMembers, setTeamMembers } = useTeamMembersContext();
   const [showForm, setShowForm] = useState(false);
   const [showConfirmDeleteForm, setShowConfirmDeleteForm] = useState(false);
-  const [ConfirmDeleteformData, setConfirmDeleteFormData] = useState<{ name: string;userId:string } | null>(null);
-  const [formData, setFormData] = useState<{ name: string; dateCreated: string | Date } | null>(null);
+  const [ConfirmDeleteformData, setConfirmDeleteFormData] = useState<MemberData | null>(null);
+  const [formData, setFormData] = useState<{ name: string; dateCreated: string | Date  } | null>(null);
   const [showEditForm, setShowEditForm] = useState(false);
 
   const { teamId } = useTeamId();
@@ -49,7 +52,7 @@ const TeamMembers: React.FC<TeamMembersProps> = ({ formatDate }) => {
 
   const handleDeleteClick = async (userId: string) => {
     try {
-      const memberToDelete = teamMembers.find((member) => member.userId === userId);
+      const memberToDelete = teamMembers.find((member) => member.userId === userId) ?? null ;
       setConfirmDeleteFormData(memberToDelete);
       setShowConfirmDeleteForm(true);
     } catch (error) {
@@ -67,7 +70,7 @@ const TeamMembers: React.FC<TeamMembersProps> = ({ formatDate }) => {
       
         const firestore = getFirestore();
         const teamCollectionRef = collection(firestore, 'Teams');
-        const teamDocRef = doc(teamCollectionRef, teamId);
+        const teamDocRef = doc(teamCollectionRef, teamId ?? undefined);
 
         await updateDoc(teamDocRef, {
           members: arrayRemove(doc(firestore, 'users', userId)),
@@ -85,10 +88,10 @@ const TeamMembers: React.FC<TeamMembersProps> = ({ formatDate }) => {
   };
 
 
-  const [editedMember, setEditedMember] = useState<Member | null>(null);
+  const [editedMember, setEditedMember] = useState<MemberData | null>(null);
 const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-const openEditModal = (member: Member) => {
+const openEditModal = (member: MemberData) => {
   setEditedMember(member);
   setIsEditModalOpen(true);
 };
@@ -105,7 +108,7 @@ const handleEditClick = (userId: string) => {
   }
 };
 
-const handleEditFormSubmit = async (updatedValues: Partial<Member>) => {
+const handleEditFormSubmit = async (updatedValues: Partial<MemberData>) => {
   try {
     // Update the Firestore document
     const firestore = getFirestore();
@@ -128,7 +131,7 @@ const handleEditFormSubmit = async (updatedValues: Partial<Member>) => {
 
 
   return (
-    <div className="fixed top-8 -ml-32">
+    <div className="fixed top-8 -ml-32 font-lato">
       <h3 className="font-bold">Team Members</h3>
       <div>
       {editedMember && (
@@ -148,7 +151,7 @@ const handleEditFormSubmit = async (updatedValues: Partial<Member>) => {
           teamMembers.map((member, index) => (
             <li key={index} className="flex items-center mb-4">
               <div
-                className="bg-red-500 text-white rounded-md p-2 w-8 h-8 mr-2 flex items-center justify-center outline outline-offset-0 outline-gray-200 cursor-pointer"
+                className="bg-red-500 text-white rounded-md p-2 w-8 h-8 mr-2 flex items-center justify-center font-lato cursor-pointer"
                 onClick={() => handleMemberClick(member.name, member.dateCreated, member.userId)}
               >
                 {member.name.charAt(0)}
@@ -187,9 +190,9 @@ const handleEditFormSubmit = async (updatedValues: Partial<Member>) => {
           <div className=' bg-gray-200 text-black w-96 text-center rounded-lg shadow-md p-6  text-sm'>
           <h2 className="text-lg font-semibold mb-2">Are you sure you want to delete {ConfirmDeleteformData?.name} </h2>
           <button onClick={handleConfirmDelete}
-          className='w-20  bg-black text-white  font-bold rounded-sm  mt-6 mr-10'>Yes</button>
+          className='w-20  bg-black text-white  font-bold rounded-md h-10  mt-6 mr-10'>Yes</button>
           <button onClick={handleCancelDelete}
-          className='w-20  bg-black text-white  font-bold rounded-sm  mt-6 mr-10'>No</button>
+          className='w-20  bg-black text-white  font-bold rounded-md h-10  mt-6 mr-10'>No</button>
         </div>
         </div>
       )}

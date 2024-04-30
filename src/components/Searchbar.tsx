@@ -1,6 +1,3 @@
-import React from 'react';
-// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-// import { faCog, faBell } from '@fortawesome/free-solid-svg-icons';
 
  const Searchbar =() =>{
     return (

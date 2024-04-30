@@ -30,7 +30,7 @@ const RightLayout: React.FC<RightLayoutProps> = ({ children }) => {
     <div
     className={`third-section ${
       isNarrowed ? 'bg-secondary-bg' : 'bg-primary-bg'
-    } w-${isNarrowed ? '10' : '80'} ml-8 bottom-0 min-h-full z-20 right-0 absolute mt-[-0.5rem]
+    } w-${isNarrowed ? '16' : '80'} ml-8 bottom-0 min-h-full z-20 right-0 absolute mt-[-0.5rem]
       transition-width flex justify-center items-center max-h-[96vh] text-primary-text
       transition-width duration-100 ease-in-out overflow-${
         isNarrowed ? 'hidden' : 'visible'
@@ -40,7 +40,7 @@ const RightLayout: React.FC<RightLayoutProps> = ({ children }) => {
         <button
           className={`arrow-button3 ${rotation === 180 ? 'rotate' : ''} text-2xl text-secondary-text text-center
             transform transition-transform duration-100 ease-in-out absolute border-none 
-            shadow-none bg-transparent ${isNarrowed ? 'top-0 right-3.5' : 'top-0 left-0.5'}`}
+            shadow-none bg-transparent ${isNarrowed ? 'top-0 right-6' : 'top-0 left-3.5'}`}
           onClick={handleButtonClick}
           style={{ transform: `rotate(${rotation}deg)` }}
         >

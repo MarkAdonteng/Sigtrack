@@ -1,5 +1,4 @@
 import React from 'react';
-import { FaPen } from 'react-icons/fa'; // Assuming you have the React Icons library installed
 
 interface AddandEditButtonProps {
     onAddClick: () => void;

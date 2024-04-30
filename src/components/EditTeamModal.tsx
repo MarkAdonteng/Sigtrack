@@ -27,57 +27,66 @@ const EditTeamModal: React.FC<{
   };
 
   return (
+
+    
     // Your modal UI
     <div className='fixed inset-0 bg-gray-900 text-black bg-opacity-50 flex justify-center items-center text-sm'>
     <div className={`modal ${isOpen ? 'open' : 'closed'}`}>
-      <div className=" bg-gray-200 text-black w-76 rounded-lg shadow-md p-6 text-sm">
-        <h2 className='text-center'>Edit Team</h2>
+      <div className=" bg-gray-200 text-black w-96 rounded-lg shadow-md p-6 text-sm">
+        <h2 className='text-center'>Edit Team Details</h2>
 
-        {/* Editable fields */}
-        <label>
-          Team Name:
-          <input
-            type="text"
-            value={editedName}
-            className='input bg-gray-100 text-gray-800 border-0 rounded-md p-2 mb-4 focus:bg-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500 transition ease-in-out duration-150 '
-            onChange={(e) => setEditedName(e.target.value)}
-          />
-        </label><br></br>
+     
+      
+        <div className="field flex flex-col">
+  <label className="label">Team Name:</label>
+  <input
+    className="input bg-gray-100 text-gray-800 border-0 rounded-md p-2 mb-4 focus:bg-gray-200 transition ease-in-out duration-150"
+    type="text"
+    value={editedName}
+    onChange={(e) => setEditedName(e.target.value)}
+  />
+</div>
 
-        <label>
-          Color:
-          <input type="color" 
-          value={editedColor} 
-          className='input bg-gray-100 text-gray-800 border-0 rounded-md p-2 mb-4 focus:bg-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500 transition ease-in-out duration-150'
-          onChange={(e) => setEditedColor(e.target.value)} />
-        </label><br></br>
 
-        <label>
-          Status:
-          <select value={editedStatus} 
-          className='input bg-gray-100 text-gray-800 border-0 rounded-md p-2 mb-4 focus:bg-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500 transition ease-in-out duration-150'
-          onChange={(e) => setEditedStatus(e.target.value)}>
-             <option value="select">Select</option>
-            <option value="active">Active</option>
-            <option value="suspended">Suspended</option>
-          </select>
-        </label><br></br>
+        <div className="field">
+            <label className="label">Color:</label>
+            <input
+              className="input bg-gray-100 text-gray-800 border-0 rounded-md p-2 mb-4 focus:bg-gray-200  transition ease-in-out duration-150"
+              type="color"
+              value={editedColor}
+              onChange={(e) => setEditedColor(e.target.value)}
+            />
+          </div>
 
-        <label className='flex'>
-           Description:
-        
-          <textarea
-            value={editedDescription}
-            className='input bg-gray-100 text-gray-800 border-0 rounded-md p-2 mb-4 focus:bg-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500 transition ease-in-out duration-150 '
-            onChange={(e) => setEditedDescription(e.target.value)}
-          />
-        </label>
+
+
+        <div className="field flex flex-col">
+            <label className='label'>Status:</label>
+            <select value={editedStatus}  
+              className='input bg-gray-100 text-gray-800 border-0 rounded-md p-2 mb-4 focus:bg-gray-200  transition ease-in-out duration-150'
+              onChange={(e) =>  setEditedStatus(e.target.value)}
+            >
+              <option value="Select Status">Select Status</option>
+              <option value="active">Active</option>
+              <option value="suspended">Suspended</option>
+            </select>
+          </div>
+
+
+        <div className="field flex flex-col">
+            <label className="label">Description:</label>
+            <textarea
+              className="input bg-gray-100 text-gray-800 border-0 ml-3 rounded-md p-2 mb-4 focus:bg-gray-200 transition ease-in-out duration-150" 
+              value={editedDescription}
+              onChange={(e) => setEditedDescription(e.target.value)}
+            />
+          </div>
           
             <div className='text-center'>
-          <button className="button is-success w-20  bg-black text-white  font-bold rounded-sm  mt-6 mr-10" onClick={handleSubmit}>
+          <button className="button is-success bg-black text-white  font-bold  w-20 h-10 rounded-md  mt-6 mr-10" onClick={handleSubmit}>
             Update
           </button>
-          <button className="button button is-success w-20  bg-black text-white font-bold rounded-sm mt-6"
+          <button className="button button is-success bg-black text-white font-bold  mt-6  w-20 h-10 rounded-md"
           onClick={() => {
     onClose(); // Close the modal when the "Cancel" button is clicked
     closeEditModal(); // Optionally, you can also call closeEditModal to reset state in the parent component

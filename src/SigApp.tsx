@@ -1,12 +1,6 @@
 // App.tsx
 import React, { useState } from 'react';
 import './App.css';
-import RightLayout from './layout/rightLayout/RightLayout';
-import RightLayoutContent from './layout/rightLayout/RightLayoutContent';
-import LeftLayout from './layout/leftLayout/LeftLayout';
-import MainLayout from './layout/mainLayout/MainLayout';
-import MainLayoutContent from './layout/mainLayout/MainLayoutContent';
-import { RightLayoutProvider } from './layout/rightLayout/RightLayoutContext';
 import { SelectedMembersProvider } from './Context/membersContext';
 import { NarrowProvider } from './Context/NarrowedContext';
 import LoginPage from './pages/LoginPage/Login';
@@ -34,7 +28,7 @@ const SigApp: React.FC = () => {
   };
 
   const handleGoogleLogin = () => {
-    console.log('Google login callback');
+    console.log('Attempting Google login....');
     setGoogleAuthenticated(true);
   };
 
@@ -57,52 +51,56 @@ const SigApp: React.FC = () => {
 
 
   return (
+    // Providers
     <LogoutProvider handleLogout={handleLogout}>
       <SelectedMembersProvider>
         <TeamMembersProvider>
-        <OrganizationProvider>
-          <NarrowProvider>
-            <TeamIdProvider>
-              <MemberProvider>
-              <UserContextProvider>
-              <div>
-                {isLoggedIn ? (
-                  <div className='flex flex-col h-screen '>
-                   
-                   <Layout/>
-
-                    {showConfirmation && (
-                <div className="modal  fixed inset-0 bg-gray-900 text-black bg-opacity-70 flex justify-center items-center z-96 text-sm">
-                  <div className="modal-content  bg-gray-200 text-black w-96 text-center rounded-lg shadow-md p-6  text-sm">
-                    <p className='text-lg font-semibold mb-2'>Are you sure you want to logout?</p>
+          <OrganizationProvider>
+            <NarrowProvider>
+              <TeamIdProvider>
+                <MemberProvider>
+                  <UserContextProvider>
                     <div>
-                      <button onClick={() => confirmLogout(true)}
-                      className='w-20  bg-black text-white  font-bold rounded-sm  mt-6 mr-10'>Yes</button>
-                      <button onClick={() => confirmLogout(false)}
-                      className='w-20  bg-black text-white  font-bold rounded-sm  mt-6 mr-10'>No</button>
+                      {/* Conditional rendering */}
+                      {isLoggedIn ? (
+                        // Render Layout component when logged in
+                        <div className='flex flex-col h-screen '>
+                          <Layout />
+
+                          {/* Modal component */}
+                          {showConfirmation && (
+                            <div className="modal  fixed inset-0 bg-gray-900 text-black bg-opacity-70 flex justify-center items-center z-96 text-sm">
+                              <div className="modal-content  bg-gray-200 text-black w-96 text-center rounded-lg shadow-md p-6  text-sm">
+                                <p className='text-lg font-semibold mb-2'>Are you sure you want to logout?</p>
+                                <div>
+                                  <button onClick={() => confirmLogout(true)}
+                                    className='w-20  bg-black text-white  font-bold rounded-sm  mt-6 mr-10'>Yes</button>
+                                  <button onClick={() => confirmLogout(false)}
+                                    className='w-20  bg-black text-white  font-bold rounded-sm  mt-6 mr-10'>No</button>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        // Render login page or Google authentication component
+                        googleAuthenticated ? (
+                          <LoginPage onLogin={handleLogin} />
+                        ) : (
+                          <GoogleAuth onGoogleLogin={handleGoogleLogin} />
+                        )
+                      )}
                     </div>
-                  </div>
-                </div>
-              )}
-                  </div>
-                ) : (
-                  // Display the Login Page after successful Google authentication
-                  googleAuthenticated ? (
-                    <LoginPage onLogin={handleLogin} />
-                  ) : (
-                    // Display the Google Authentication component if not authenticated
-                    <GoogleAuth onGoogleLogin={handleGoogleLogin} />
-                  ))}
-              </div>
-              </UserContextProvider>
-              </MemberProvider>
-            </TeamIdProvider>
-          </NarrowProvider>
-        </OrganizationProvider>
+                  </UserContextProvider>
+                </MemberProvider>
+              </TeamIdProvider>
+            </NarrowProvider>
+          </OrganizationProvider>
         </TeamMembersProvider>
       </SelectedMembersProvider>
     </LogoutProvider>
   );
 };
+
 
 export default SigApp;

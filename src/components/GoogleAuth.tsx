@@ -27,19 +27,20 @@ const GoogleAuth: React.FC<GoogleAuthProps> = ({ onGoogleLogin }) => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen">
-      <div className='flex flex-col items-center justify-center bg-gray-200 h-80 w-96 rounded-3xl'>
+    <div className="flex items-center justify-center h-screen">
+      <div className='flex items-center justify-center bg-gray-200 h-80 w-96 rounded-3xl'>
       <img
           src="/src/assets/images/SIGTRACK.png"  // Replace with the path to your image
           alt="Sigtrack Logo"
-          className="mb-44 absolute"      // Use mx-auto to center the image horizontally
+          className="mb-48 absolute"      // Use mx-auto to center the image horizontally
           style={{ maxWidth: '120px' }}  // Set a maximum width for the image
         />
-        <h1 className='mt-0 ml-2 absolute font-serif font-bold'>Welcome to Sigtrack</h1>
+        <h1 className='mb-10 ml-2 absolute font-serif font-bold'>Welcome to Sigtrack</h1>
+        <div>
       <button
             onClick={handleGoogleLogin}
 
-            className="flex items-center justify-center py-2 px-20  mt-36 bg-white hover:bg-gray-200 focus:ring-blue-500 ml-0 h-[50px] focus:ring-offset-blue-200 text-gray-700  transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-[15px]"
+            className="flex items-center justify-center py-2 px-20  mt-16 bg-white hover:bg-gray-200 ml-0 h-16 focus:ring-offset-blue-200 text-gray-700  transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-2xl"
           >
             <svg
               viewBox="0 0 24 24"
@@ -110,23 +111,20 @@ const GoogleAuth: React.FC<GoogleAuthProps> = ({ onGoogleLogin }) => {
             <span className="ml-2">Sign in with Google</span>
           </button>
 
-           <div className='flex items-center mt-2 cursor-pointer justify-center py-2 px-12 bg-white hover:bg-gray-200 focus:ring-blue-500 ml-0 h-[50px] focus:ring-offset-blue-200 text-gray-700  transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-[15px]'
-          onClick={navigateToMesh}> 
+          <button className='flex items-center justify-center py-2 px-20 mt-2 mr-2 absolute bg-white hover:bg-gray-200 ml-0 h-16 rounded-2xl  text-gray-700  transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 w-[330px]'>
           <img
             src="/src/assets/images/mesh.svg"
             alt="Sigtrack Logo"
-            className="w-20 cursor-pointer"
+            className="cursor-pointer w-24 absolute mr-44"
+            onClick={navigateToMesh}
           />
-          <span className='text-center'>Connect to Mestastics</span>
-          
-        </div>
-         
+          Go to mestastics
+          </button>
+          </div>
+ 
 
       </div>
-      
-       
-        </div>
-                
+                 </div>
     )
 }
 

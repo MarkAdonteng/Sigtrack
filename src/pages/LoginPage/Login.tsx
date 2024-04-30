@@ -1,14 +1,10 @@
 import React, { useState } from 'react';
-import { auth, db } from '../../services/firebase';
 import { getPasswords } from '../../repo/passwordRepo/getPassword';
 import { getOrganizations } from '../../repo/organizationRepo/getOrganization';
 import { getUserStatus } from '../../repo/statusRepo/getUserStatus';
 import { useOrganizationContext } from '../../Context/organizationContext';
-import TeamNamesComponent from '../../repo/getTeamOrg';
-import FirstSectionContent from '../../layout/leftLayout/FirstSectionContent';
 import { getUserName } from '../../repo/userRepo/getUserName'; // Adjust the import path as needed
 import { useUserContext } from '../../Context/LoggedInUserContext';
-
 
 interface LoginPageProps {
   onLogin: () => void;
@@ -29,6 +25,9 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false); // Added loading state
   const [showLoginForm, setShowLoginForm] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [modalContent, setModalContent] = useState('');
+
   const { setUserId } = useUserContext();
   const { setEnteredOrganization } = useOrganizationContext();
 
@@ -68,7 +67,8 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
   
               if (loggedInUserData) {
                 // Display the user's name
-                alert(`Welcome, ${loggedInUserData.name}!`);
+                setShowModal(true);
+                setModalContent(`Welcome, ${loggedInUserData.name}!`);
               } else {
                 console.log('User not found.');
               }
@@ -84,15 +84,16 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
         }
       }
   
-      alert('Invalid password for all users with the entered organization');
+      setShowModal(true);
+      setModalContent('Invalid password for all users with the entered organization');
       setLoading(false);
     } catch (error) {
       console.error('Error fetching data:', error);
-      alert('Error fetching data. Please try again.');
+      setShowModal(true);
+      setModalContent('Error fetching data. Please try again.');
       setLoading(false);
     }
   };
-  
 
   const handleLogout = () => {
     // Implement logout logic here
@@ -100,69 +101,75 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
     alert('Logout successful!');
   };
 
+  const closeModal = () => {
+    setShowModal(false);
+    setModalContent('');
+  };
   
   return (
     <div className="flex items-center justify-center h-screen">
-      {showLoginForm ?
-      
-       
-         <div
-    className="text-center justify-center w-96 h-[450px] bg-[rgb(217,_217,_217)] rounded-[60px]"
-    >
+      {showLoginForm ? (
+        <div className="text-center justify-center w-96 h-[450px] bg-[rgb(217,_217,_217)] rounded-[60px]">
           <img
-          src="/src/assets/images/SIGTRACK.png"  // Replace with the path to your image
-          alt="Sigtrack Logo"
-          className="mb-6 mt-6 ml-12 absolute"      // Use mx-auto to center the image horizontally
-          style={{ maxWidth: '80px' }}  // Set a maximum width for the image
-        />
-        <h1 className='font-bold text-4xl mt-28 ml-10 absolute'> Sigtrack Login</h1>
-        <div >
-            <input type='text' placeholder='enter organization' onChange={(e) => setOrganization(e.target.value)}
-            className='w-80 h-[50px] bg-white font-bold text-gray-400 p-4 rounded-[15px] mt-44' />
-
-            <input type='password' placeholder='enter password' onChange={(e) => setPassword(e.target.value)}
-             className='w-80 h-[50px] bg-white font-bold text-gray-400 p-4 rounded-[15px] mt-4' />
+            src="/src/assets/images/SIGTRACK.png"  // Replace with the path to your image
+            alt="Sigtrack Logo"
+            className="mb-6 mt-6 ml-12 absolute"      // Use mx-auto to center the image horizontally
+            style={{ maxWidth: '80px' }}  // Set a maximum width for the image
+          />
+          <h1 className='font-bold text-4xl mt-28 ml-10 absolute'> Sigtrack Login</h1>
+          <div>
+            <input
+              type='text'
+              placeholder='enter organization'
+              onChange={(e) => setOrganization(e.target.value)}
+              className='w-80 h-[50px] bg-white font-bold text-gray-400 p-4 rounded-[15px] mt-44'
+            />
+            <input
+              type='password'
+              placeholder='enter password'
+              onChange={(e) => setPassword(e.target.value)}
+              className='w-80 h-[50px] bg-white font-bold text-gray-400 p-4 rounded-[15px] mt-4'
+            />
+          </div>
+          <div>
+            <button
+              onClick={handleLogin}
+              className={`w-32 h-[50px] bg-black text-white text-2xl font-bold rounded-[15px] mt-6 ml-44 ${
+                loading ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+              disabled={loading}
+            >
+              {loading ? (
+                <div className="flex-col gap-4 w-full flex items-center justify-center">
+                  <div className="w-10 h-10 border-8 text-blue-400 text-4xl animate-spin border-gray-300 flex items-center justify-center border-t-blue-400 rounded-full"></div>
+                </div>
+              ) : (
+                'Sign In'
+              )}
+            </button>
+          </div>
+          <hr className='text-white mt-2'></hr>
+          <hr className='text-white mt-2'></hr>
+          <div>
+            <p className='font-bold text-sm mr-20'>Not registered, click here to register</p>
+          </div>
         </div>
-
-        <div>
-        <button
-            onClick={handleLogin}
-            className={`w-32 h-[50px] bg-black text-white text-2xl font-bold rounded-[15px] mt-6 ml-44 ${
-              loading ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
-            disabled={loading}
-          >
-            {loading ? (
-             <div className="flex-col gap-4 w-full flex items-center justify-center">
-             <div className="w-10 h-10 border-8 text-blue-400 text-4xl animate-spin border-gray-300 flex items-center justify-center border-t-blue-400 rounded-full">
-            
-              
-             </div>
-           </div>
-            ) : (
-              'Sign In'
-            )}
-          </button>
+      ) : (
+        <div className='text-center mb-2'>
+          <div className='text-2xl font-semibold'>You Are Suspended</div>
+          <p className='text-sm'> Please contact your Admin to rectify your user status</p>
         </div>
-        <hr className='text-white mt-2'></hr>
-       
-        <hr className='text-white mt-2'></hr>
-       
-        <div>
-          <p className='font-bold text-sm mr-20'>Not registered, click here to register</p>
+      )}
+      {showModal && (
+        <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-gray-800 bg-opacity-75 z-50">
+          <div className="bg-white p-8 rounded shadow-lg">
+            <p>{modalContent}</p>
+            <button onClick={closeModal} className="mt-4 bg-gray-800 text-white py-2 px-4 rounded">Close</button>
+          </div>
         </div>
-      </div>
-      
-     : (
-      <div className='text-center mb-2'>
-        <div className='text-2xl font-semibold'>You Are Suspended</div>
-        <p className='text-sm'> Please contact your Admin to rectify your user status</p>
-        </div>
-      
-    )}
-  </div>
-     
+      )}
+    </div>
   );
 };
 
-export default LoginPage; 
+export default LoginPage;

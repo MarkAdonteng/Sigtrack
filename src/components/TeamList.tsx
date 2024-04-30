@@ -3,13 +3,12 @@ import { collection, onSnapshot, getDoc,updateDoc,deleteDoc, DocumentReference, 
 import db from '../services/Firestore';
 import { useSelectedMembers } from '../Context/membersContext';
 import { useNarrowContext } from '../Context/NarrowedContext';
-import { useOrganizationContext } from '../Context/organizationContext';
-import AddandEditButton from './AddandEditButton';
 import AddTeamModal from './AddTeamModal';
 import { RiPencilFill, RiDeleteBin6Line } from 'react-icons/ri';
 import EditTeamModal from './EditTeamModal';
 import { useTeamId } from '../Context/TeamIdContext';
 import { useTeamMembersContext } from '../Context/TeamMembersContext';
+import { useOrganizationContext } from '../Context/organizationContext';
 
 
 export interface Team {
@@ -77,6 +76,7 @@ const TeamList: React.FC<TeamListProps> = ({ displayIconsOnly = false }) => {
   const { selectedMembers, dispatch } = useSelectedMembers();
   const [showConfirmDeleteForm, setShowConfirmDeleteForm] = useState(false);
   const [ConfirmDeleteformData, setConfirmDeleteFormData] = useState<{ name: string;teamId:string } | null>(null);
+  const [loading, setLoading] = useState(true);
 
 
   const [{ activeTeams, suspendedTeams }, teamsDispatch] = useReducer(teamsReducer, {
@@ -166,6 +166,8 @@ const { setTeamMembers } = useTeamMembersContext();
 
 const handleTeamNameClick = async (members: DocumentReference[], teamId: string) => {
   try {
+    setLoading(true); // Set loading state to true
+
     console.log('Clicked Team ID:', teamId); // Log the teamId to the console
 
     const teamMembersData: MemberData[] = [];
@@ -238,8 +240,10 @@ const handleTeamNameClick = async (members: DocumentReference[], teamId: string)
     });
    
     setTeamId(teamId);
+    setLoading(false); // Unset loading state when data fetching is completed
   } catch (error) {
     console.error('Error fetching user document:', error);
+    setLoading(false); // Unset loading state in case of error
   }
 };
 
@@ -416,106 +420,103 @@ const handleEditFormSubmit = async (updatedValues: Partial<Team>) => {
       )}
       </div>
            
-      {!displayIconsOnly && <h2 className="font-bold">Active Teams</h2>}
+      {!displayIconsOnly && <h2 className="font-bold font-lato">Active Teams</h2>}
       <ul>
-        {activeTeams.map((team) => (
-          <li key={team.id} className="flex items-center mb-2 cursor-pointer space-y-2  ">
-            {displayIconsOnly ? (
-              <div
-                className={`rounded-md p-2 w-8 h-8 mr-2 flex items-center justify-center mb-4 outline outline-offset-0 outline-gray-200`}
-                style={{
-                  backgroundColor: team.color || 'brown',
-                  color: 'white',
-                 
-                }}
-              >
-                {team.name.charAt(0)}
-              </div>
-            ) : (
-              <>
-                <div
-                  className={`rounded-md p-2 w-8 h-8 mr-2 flex items-center justify-center space-y-2 outline outline-offset-0 outline-gray-200`}
-                  style={{
-                    backgroundColor: team.color || 'brown',
-                    color: 'white',
-                  }}
-                >
-                  {team.name.charAt(0)}
-                </div>
-                <div className="font-semibold">
-                  <div onClick={() =>handleTeamNameClick(team.members, team.id)}>
-                    <div className="text-sm font-bold  text-primary-text">{team.name}</div>
-                    <div className="text-xs text-secondary-text">{team.date_established?.seconds && new Date(team.date_established.seconds * 1000).toLocaleDateString()}</div>
-                  </div>
-                </div>
+      {activeTeams.map((team) => (
+  <li key={team.id} className="flex items-center mb-2 cursor-pointer font-lato">
+    {displayIconsOnly ? (
+      <div
+        className="rounded-md p-2 w-8 h-8 mr-2 flex items-center justify-center"
+        style={{
+          backgroundColor: team.color || 'brown',
+          color: 'white',
+        }}
+      >
+        {team.name.charAt(0)}
+      </div>
+    ) : (
+      <>
+        <div
+          className="rounded-md p-2 w-8 h-8 mr-2 flex items-center justify-center"
+          style={{
+            backgroundColor: team.color || 'brown',
+            color: 'white',
+          }}
+        >
+          {team.name.charAt(0)}
+        </div>
+        <div className="flex-grow flex items-center">
+          <div onClick={() => handleTeamNameClick(team.members, team.id)}>
+            {/* Added "marquee" class conditionally */}
+            <div className={`overflow-hidden whitespace-nowrap text-ellipsis text-sm font-bold text-primary-text ${team.name.length > 10 ? 'marquee' : ''}`}>
+              {team.name}
+            </div>
+            <div className="text-xs text-secondary-text">{team.date_established?.seconds && new Date(team.date_established.seconds * 1000).toLocaleDateString()}</div>
+          </div>
+          <div className="flex ml-auto space-x-2">
+            <RiPencilFill
+              className="text-primary cursor-pointer"
+              onClick={() => handleEditButtonClick(team.id)}
+            />
+            <RiDeleteBin6Line
+              className="text-red-500 cursor-pointer"
+              onClick={() => handleDeleteButtonClick(team.id)}
+            />
+          </div>
+        </div>
+      </>
+    )}
+  </li>
+))}
 
 
-                <div className="flex ml-auto space-x-2 ">
-                  <RiPencilFill
-                    className="text-primary cursor-pointer"
-                    onClick={() => handleEditButtonClick(team.id)}
-                  />
-                  <RiDeleteBin6Line
-                    className="text-red-500 cursor-pointer"
-                    onClick={() => handleDeleteButtonClick(team.id)}
-                  />
-                </div>
-              </>
-            )}
-            
-          </li>
-        ))}
       </ul>
 
-      {!displayIconsOnly && <h2 className="font-bold mt-4">Suspended Teams</h2>}
+      {!displayIconsOnly && <h2 className="font-bold mt-4 font-lato">Suspended Teams</h2>}
       <ul>
-        {suspendedTeams.map((team) => (
-          <li key={team.id} className="flex items-center mb-2 cursor-pointer  space-y-2">
-            {displayIconsOnly ? (
-              <div
-                className={`rounded-md  w-8 h-8 mr-2 flex items-center justify-center mb-4 outline outline-offset-0 outline-gray-200 `}
-                style={{
-                  backgroundColor: 'transparent', // Set background color to transparent
-                  
-                  color: 'white',
-                }}
-              >
-                {team.name.charAt(0)}
-              </div>
-            ) : (
-              <>
-                <div
-                  className={`rounded-md p-2 w-8 h-8 mr-2 flex items-center justify-center outline outline-offset-0 outline-gray-200`}
-                  style={{
-                    backgroundColor: team.color || 'brown',
-                    color: 'white',
-                  }}
-                >
-                  {team.name.charAt(0)}
-                </div>
-                <div className="font-semibold">
-                  <div onClick={() => handleTeamNameClick(team.members, team.id)}>
-                    <div className="text-sm font-bold text-primary-text">{team.name}</div>
-                    <div className="text-xs text-secondary-text">
-                      {team.date_established?.seconds && new Date(team.date_established.seconds * 1000).toLocaleDateString()}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex ml-auto space-x-2">
-                  <RiPencilFill
-                    className="text-primary cursor-pointer"
-                    onClick={() => handleEditButtonClick(team.id)}
-                  />
-                  <RiDeleteBin6Line
-                    className="text-red-500 cursor-pointer"
-                    onClick={() => handleDeleteButtonClick(team.id)}
-                  />
-                </div>
-              </>
-            )}
-          </li>
-        ))}
+       {suspendedTeams.map((team) => (
+  <li key={team.id} className="flex items-center mb-2 cursor-pointer font-lato">
+    {displayIconsOnly ? (
+      <div
+        className="rounded-md p-2 w-8 h-8 mr-2 flex items-center justify-center"
+        style={{
+          backgroundColor: team.color || 'brown',
+          color: 'white',
+        }}
+      >
+        {team.name.charAt(0)}
+      </div>
+    ) : (
+      <>
+        <div
+          className="rounded-md p-2 w-8 h-8 mr-2 flex items-center justify-center"
+          style={{
+            backgroundColor: team.color || 'brown',
+            color: 'white',
+          }}
+        >
+          {team.name.charAt(0)}
+        </div>
+        <div className="flex-grow flex items-center">
+          <div onClick={() => handleTeamNameClick(team.members, team.id)}>
+            <div className="text-sm font-bold text-primary-text">{team.name}</div>
+            <div className="text-xs text-secondary-text">{team.date_established?.seconds && new Date(team.date_established.seconds * 1000).toLocaleDateString()}</div>
+          </div>
+          <div className="flex ml-auto space-x-2">
+            <RiPencilFill
+              className="text-primary cursor-pointer"
+              onClick={() => handleEditButtonClick(team.id)}
+            />
+            <RiDeleteBin6Line
+              className="text-red-500 cursor-pointer"
+              onClick={() => handleDeleteButtonClick(team.id)}
+            />
+          </div>
+        </div>
+      </>
+    )}
+  </li>
+))}
       </ul>
 
        {/* Display form when showForm is true */}
@@ -524,9 +525,9 @@ const handleEditFormSubmit = async (updatedValues: Partial<Team>) => {
           <div className=' bg-gray-200 text-black w-96 text-center rounded-lg shadow-md p-6  text-sm'>
           <h2 className="text-lg font-semibold mb-2">Are you sure you want to delete {ConfirmDeleteformData?.name} </h2>
           <button onClick={handleConfirmDelete}
-          className='w-20  bg-black text-white  font-bold rounded-sm  mt-6 mr-10'>Yes</button>
+          className='w-20  bg-black text-white  font-bold rounded-md h-10  mt-6 mr-10'>Yes</button>
           <button onClick={handleCancelDelete}
-          className='w-20  bg-black text-white  font-bold rounded-sm  mt-6 mr-10'>No</button>
+          className='w-20  bg-black text-white  font-bold rounded-md h-10 mt-6 mr-10'>No</button>
         </div>
         </div>
       )}
