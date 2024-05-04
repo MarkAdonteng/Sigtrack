@@ -1,32 +1,21 @@
-
 import React from 'react';
 import Searchbar from '../../components/Searchbar';
-import AddandEditButton from '../../components/AddandEditButton';
 import SettingsButton from '../../components/SettingsButton';
 import TeamList from '../../components/TeamList';
 
-
 const RightLayoutContent = () => {
   return (
-    <div className=' font-semibold text-primary-text mb-4'>
-      <SettingsButton/>
+   
+      <div className="relative space-y-4">
+        
+     <SettingsButton/>
+        <Searchbar />
        
-      <Searchbar />
-
-     {/* <TeamListDisplay
-     teamSectionTitles={{ team: 'Team', suspendedTeam: 'Suspended Team' }}/> */}
-     <TeamList/>
-  
-     
-
-     {/* <AddandEditButton/> */}
       
+      <TeamList />
     
-      </div>
-  
+    </div>
   );
 };
 
 export default RightLayoutContent;
-
-

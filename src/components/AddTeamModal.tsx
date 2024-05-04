@@ -80,10 +80,10 @@ const AddTeamModal: React.FC<AddTeamModalProps> = ({ isOpen, onClose, onSubmit }
           </div>
         </section>
         <footer className="modal-card-foot text-center">
-          <button className="button is-success w-20 h-10 rounded-md  bg-black text-white font-bold mt-6 mr-10 " onClick={handleSubmit}>
+          <button className="button is-success w-20 h-10 rounded-md  bg-white text-black font-bold mt-6 mr-10 hover:bg-gray-300" onClick={handleSubmit}>
             Save
           </button>
-          <button className="button button is-success w-20 h-10 rounded-md  bg-black text-white  font-bold mt-6" onClick={onClose}>
+          <button className="button button is-success w-20 h-10 rounded-md  bg-white text-black  font-bold mt-6 hover:bg-gray-300" onClick={onClose}>
             Cancel
           </button>
         </footer>

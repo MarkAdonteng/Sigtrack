@@ -74,9 +74,9 @@ const SigApp: React.FC = () => {
                                 <p className='text-lg font-semibold mb-2'>Are you sure you want to logout?</p>
                                 <div>
                                   <button onClick={() => confirmLogout(true)}
-                                    className='w-20  bg-black text-white  font-bold rounded-sm  mt-6 mr-10'>Yes</button>
+                                    className='  bg-black text-white  font-bold rounded-lg w-20 h-10 mt-6 mr-10'>Yes</button>
                                   <button onClick={() => confirmLogout(false)}
-                                    className='w-20  bg-black text-white  font-bold rounded-sm  mt-6 mr-10'>No</button>
+                                    className='w-20 h-10  bg-black text-white  font-bold rounded-lg  mt-6 mr-10'>No</button>
                                 </div>
                               </div>
                             </div>

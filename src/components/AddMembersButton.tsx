@@ -121,8 +121,8 @@ const AddMembersButton: React.FC<AddMembersProps> = () => {
 
 
   return (
-    <div className="flex space-x-4 absolute top-72 mr-32 -left-28 w-96 text-black  text-sm">
-      <button className="bg-white text-black px-4 py-2 rounded absolute" onClick={handleAddMemberClick}>
+    <div className="flex  absolute top-72 mr-20 w-96 text-black   text-sm font-lato">
+      <button className="bg-white text-black px-4 py-2 rounded absolute w-72 -left-36 mt-4" onClick={handleAddMemberClick}>
         Add Members
       </button>
 
@@ -207,13 +207,13 @@ const AddMembersButton: React.FC<AddMembersProps> = () => {
 <div className='text-center'>
             <button
               onClick={handleFormSubmit}
-              className="button is-success bg-black text-white  font-bold w-20 h-10 rounded-md mt-6 mr-10"
+              className="button is-success bg-white text-black  font-bold w-20 h-10 rounded-md mt-6 mr-10 hover:bg-gray-300"
             >
               Submit
             </button>
             <button
               onClick={handleModalClose}
-              className="button button is-success bg-black text-white font-bold w-20 h-10 rounded-md mt-6"
+              className="button button is-success bg-white text-black font-bold w-20 h-10 rounded-md mt-6 hover:bg-gray-300"
             >
               Cancel
             </button>

@@ -132,7 +132,7 @@ const handleEditFormSubmit = async (updatedValues: Partial<MemberData>) => {
 
   return (
     <div className="fixed top-8 -ml-32 font-lato">
-      <h3 className="font-bold">Team Members</h3>
+      <h3 className="font-bold mb-2">Team Members</h3>
       <div>
       {editedMember && (
         <EditMemberModal
@@ -165,7 +165,7 @@ const handleEditFormSubmit = async (updatedValues: Partial<MemberData>) => {
                 </div>
                 <div className="flex items-center absolute space-x-2 ml-36 mt-1">
                  <RiPencilFill
-                    className="text-primary cursor-pointer"
+                    className="text-primary cursor-pointer text-gray-500"
                     onClick={() => handleEditClick(member.userId)}
                   />
 
@@ -175,7 +175,7 @@ const handleEditFormSubmit = async (updatedValues: Partial<MemberData>) => {
                     onClick={() => handleDeleteClick(member.userId)}
                   />
                 </div>
-                <div className="text-xs text-secondary-text">
+                <div className="text-xs text-gray-500">
                   {formatDate(member.dateCreated)}
                 </div>
               </div>
@@ -190,9 +190,9 @@ const handleEditFormSubmit = async (updatedValues: Partial<MemberData>) => {
           <div className=' bg-gray-200 text-black w-96 text-center rounded-lg shadow-md p-6  text-sm'>
           <h2 className="text-lg font-semibold mb-2">Are you sure you want to delete {ConfirmDeleteformData?.name} </h2>
           <button onClick={handleConfirmDelete}
-          className='w-20  bg-black text-white  font-bold rounded-md h-10  mt-6 mr-10'>Yes</button>
+          className='w-20  bg-white text-black  font-bold rounded-md h-10  mt-6 mr-10 hover:bg-gray-300'>Yes</button>
           <button onClick={handleCancelDelete}
-          className='w-20  bg-black text-white  font-bold rounded-md h-10  mt-6 mr-10'>No</button>
+          className='w-20  bg-white text-black  font-bold rounded-md h-10  mt-6 mr-10 hover:bg-gray-300'>No</button>
         </div>
         </div>
       )}

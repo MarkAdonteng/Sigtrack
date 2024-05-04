@@ -9,6 +9,8 @@ import EditTeamModal from './EditTeamModal';
 import { useTeamId } from '../Context/TeamIdContext';
 import { useTeamMembersContext } from '../Context/TeamMembersContext';
 import { useOrganizationContext } from '../Context/organizationContext';
+import TeamItem from './TeamItem';
+
 
 
 export interface Team {
@@ -166,7 +168,7 @@ const { setTeamMembers } = useTeamMembersContext();
 
 const handleTeamNameClick = async (members: DocumentReference[], teamId: string) => {
   try {
-    setLoading(true); // Set loading state to true
+    setLoading(true); // Set loading state to true at the beginning
 
     console.log('Clicked Team ID:', teamId); // Log the teamId to the console
 
@@ -191,21 +193,17 @@ const handleTeamNameClick = async (members: DocumentReference[], teamId: string)
           const memberLongitude = userData?.longitude || 0; // Assuming longitude is a number
           const memberLatitude = userData?.latitude || 0; // Assuming latitude is a number
           const memberPassword = userData?.password || ''; 
-      
 
-          // Set memberDateCreated to Date.now() for new members
           let memberDateCreated: string | Date = new Date(Date.now());
 
           if ('dateCreated' in userData && userData.dateCreated !== undefined) {
             const timestamp = userData.dateCreated.seconds * 1000;
             memberDateCreated = new Date(timestamp);
           } else {
-            // If dateCreated is already a date, use it directly
             memberDateCreated = userData?.dateCreated || '';
           }
 
           const memberUserId = userId; // Get the userId
-          
 
           teamMembersData.push({
             name: memberName,
@@ -218,7 +216,6 @@ const handleTeamNameClick = async (members: DocumentReference[], teamId: string)
             latitude: memberLatitude,
             password: memberPassword,
           });
- 
         }
       }
     }
@@ -227,10 +224,7 @@ const handleTeamNameClick = async (members: DocumentReference[], teamId: string)
       toggleIsNarrowed1();
     }
 
-    // Set the state to display members below the clicked team
     setTeamMembers(teamMembersData);
-
-    // Save selectedMembers and teamDateCreated to sessionStorage
     sessionStorage.setItem('selectedMembers', JSON.stringify(teamMembersData));
     sessionStorage.setItem('teamDateCreated', JSON.stringify(teamDateCreated));
 
@@ -238,7 +232,7 @@ const handleTeamNameClick = async (members: DocumentReference[], teamId: string)
       type: 'SET_SELECTED_MEMBERS',
       payload: `${teamMembersData.map((member) => `${member.name} - ${member.dateCreated} - ${member.userId}`).join(', ')}`,
     });
-   
+
     setTeamId(teamId);
     setLoading(false); // Unset loading state when data fetching is completed
   } catch (error) {
@@ -246,7 +240,6 @@ const handleTeamNameClick = async (members: DocumentReference[], teamId: string)
     setLoading(false); // Unset loading state in case of error
   }
 };
-
 
 
 
@@ -402,9 +395,14 @@ const handleEditFormSubmit = async (updatedValues: Partial<Team>) => {
 
 
   return (
-    <div className='mb-2 -left-8  -mt-72 font-mono absolute '>
+    <div className='font-latto '>
+       {/* {loading && (
+        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
+          <div className="loader">Loading...</div>
+        </div>
+      )} */}
       <div className='-ml-8 '>
-      {isModalOpen && <div className='fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center'><AddTeamModal isOpen={isModalOpen}  onClose={closeModal} onSubmit={handleSubmitForm} /></div>}
+      {isModalOpen && <div className='fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center '><AddTeamModal isOpen={isModalOpen}  onClose={closeModal} onSubmit={handleSubmitForm} /></div>}
       
       {editedTeam && (
        <EditTeamModal
@@ -419,105 +417,40 @@ const handleEditFormSubmit = async (updatedValues: Partial<Team>) => {
       
       )}
       </div>
-           
-      {!displayIconsOnly && <h2 className="font-bold font-lato">Active Teams</h2>}
+           <div className='space-y-2'>
+      {!displayIconsOnly && <h2 className="font-bold font-lato text-black ">Active Teams</h2>}
       <ul>
       {activeTeams.map((team) => (
-  <li key={team.id} className="flex items-center mb-2 cursor-pointer font-lato">
-    {displayIconsOnly ? (
-      <div
-        className="rounded-md p-2 w-8 h-8 mr-2 flex items-center justify-center"
-        style={{
-          backgroundColor: team.color || 'brown',
-          color: 'white',
-        }}
-      >
-        {team.name.charAt(0)}
-      </div>
-    ) : (
-      <>
-        <div
-          className="rounded-md p-2 w-8 h-8 mr-2 flex items-center justify-center"
-          style={{
-            backgroundColor: team.color || 'brown',
-            color: 'white',
-          }}
-        >
-          {team.name.charAt(0)}
-        </div>
-        <div className="flex-grow flex items-center">
-          <div onClick={() => handleTeamNameClick(team.members, team.id)}>
-            {/* Added "marquee" class conditionally */}
-            <div className={`overflow-hidden whitespace-nowrap text-ellipsis text-sm font-bold text-primary-text ${team.name.length > 10 ? 'marquee' : ''}`}>
-              {team.name}
-            </div>
-            <div className="text-xs text-secondary-text">{team.date_established?.seconds && new Date(team.date_established.seconds * 1000).toLocaleDateString()}</div>
-          </div>
-          <div className="flex ml-auto space-x-2">
-            <RiPencilFill
-              className="text-primary cursor-pointer"
-              onClick={() => handleEditButtonClick(team.id)}
-            />
-            <RiDeleteBin6Line
-              className="text-red-500 cursor-pointer"
-              onClick={() => handleDeleteButtonClick(team.id)}
-            />
-          </div>
-        </div>
-      </>
-    )}
-  </li>
-))}
+        <TeamItem
+          key={team.id}
+          team={team}
+          onEdit={handleEditButtonClick}
+          onDelete={handleDeleteButtonClick}
+          onTeamClick={handleTeamNameClick}
+          displayIconsOnly={displayIconsOnly}
+        />
+      ))}
+    </ul>
 
 
-      </ul>
-
-      {!displayIconsOnly && <h2 className="font-bold mt-4 font-lato">Suspended Teams</h2>}
+      <hr className='w-[250px] space-y-8  '></hr>
+      
+<div className='space-y-2'>
+      {!displayIconsOnly && <h2 className="font-bold  font-lato text-black ">Suspended Teams</h2>}
       <ul>
-       {suspendedTeams.map((team) => (
-  <li key={team.id} className="flex items-center mb-2 cursor-pointer font-lato">
-    {displayIconsOnly ? (
-      <div
-        className="rounded-md p-2 w-8 h-8 mr-2 flex items-center justify-center"
-        style={{
-          backgroundColor: team.color || 'brown',
-          color: 'white',
-        }}
-      >
-        {team.name.charAt(0)}
+      {suspendedTeams.map((team) => (
+        <TeamItem
+          key={team.id}
+          team={team}
+          onEdit={handleEditButtonClick}
+          onDelete={handleDeleteButtonClick}
+          onTeamClick={handleTeamNameClick}
+          displayIconsOnly={displayIconsOnly}
+        />
+      ))}
+    </ul>
       </div>
-    ) : (
-      <>
-        <div
-          className="rounded-md p-2 w-8 h-8 mr-2 flex items-center justify-center"
-          style={{
-            backgroundColor: team.color || 'brown',
-            color: 'white',
-          }}
-        >
-          {team.name.charAt(0)}
-        </div>
-        <div className="flex-grow flex items-center">
-          <div onClick={() => handleTeamNameClick(team.members, team.id)}>
-            <div className="text-sm font-bold text-primary-text">{team.name}</div>
-            <div className="text-xs text-secondary-text">{team.date_established?.seconds && new Date(team.date_established.seconds * 1000).toLocaleDateString()}</div>
-          </div>
-          <div className="flex ml-auto space-x-2">
-            <RiPencilFill
-              className="text-primary cursor-pointer"
-              onClick={() => handleEditButtonClick(team.id)}
-            />
-            <RiDeleteBin6Line
-              className="text-red-500 cursor-pointer"
-              onClick={() => handleDeleteButtonClick(team.id)}
-            />
-          </div>
-        </div>
-      </>
-    )}
-  </li>
-))}
-      </ul>
+      </div>
 
        {/* Display form when showForm is true */}
        {showConfirmDeleteForm && (
@@ -525,25 +458,27 @@ const handleEditFormSubmit = async (updatedValues: Partial<Team>) => {
           <div className=' bg-gray-200 text-black w-96 text-center rounded-lg shadow-md p-6  text-sm'>
           <h2 className="text-lg font-semibold mb-2">Are you sure you want to delete {ConfirmDeleteformData?.name} </h2>
           <button onClick={handleConfirmDelete}
-          className='w-20  bg-black text-white  font-bold rounded-md h-10  mt-6 mr-10'>Yes</button>
+          className='w-20  bg-white text-black  font-bold rounded-md h-10  mt-6 mr-10 hover:bg-gray-300'>Yes</button>
           <button onClick={handleCancelDelete}
-          className='w-20  bg-black text-white  font-bold rounded-md h-10 mt-6 mr-10'>No</button>
+          className='w-20  bg-white text-black  font-bold rounded-md h-10 mt-6 mr-10 hover:bg-gray-300'>No</button>
         </div>
         </div>
       )}
 
      
       {/* <AddandEditButton onAddClick={handleAddButtonClick}  /> */}
-      <div className="flex space-x-4 absolute top-96 mt-[241px] ml-10 ">
+      {!displayIconsOnly && (
+      <div className="flex absolute mt-[180px] right-0 ">
         
             
-        <button className="bg-white text-black px-4 py-2 rounded text-sm"
+        <button className="bg-white text-black px-4 py-2 rounded text-sm w-64 "
        onClick={handleAddButtonClick} >
             Add Team
         </button>
-        
+         
         
     </div>
+      )}
      
     </div>
   );

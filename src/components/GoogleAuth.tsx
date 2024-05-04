@@ -40,7 +40,7 @@ const GoogleAuth: React.FC<GoogleAuthProps> = ({ onGoogleLogin }) => {
       <button
             onClick={handleGoogleLogin}
 
-            className="flex items-center justify-center py-2 px-20  mt-16 bg-white hover:bg-gray-200 ml-0 h-16 focus:ring-offset-blue-200 text-gray-700  transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-2xl"
+            className="flex items-center justify-center py-2 px-20  mt-16 bg-white hover:bg-gray-200 ml-0 h-14 focus:ring-offset-blue-200 text-gray-700  transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-2xl"
           >
             <svg
               viewBox="0 0 24 24"
@@ -111,7 +111,7 @@ const GoogleAuth: React.FC<GoogleAuthProps> = ({ onGoogleLogin }) => {
             <span className="ml-2">Sign in with Google</span>
           </button>
 
-          <button className='flex items-center justify-center py-2 px-20 mt-2 mr-2 absolute bg-white hover:bg-gray-200 ml-0 h-16 rounded-2xl  text-gray-700  transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 w-[330px]'>
+          <button className='flex items-center justify-center py-2 px-20 mt-2 mr-2 absolute bg-white hover:bg-gray-200 ml-0 h-14 rounded-2xl  text-gray-700  transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 w-[330px]'>
           <img
             src="/src/assets/images/mesh.svg"
             alt="Sigtrack Logo"

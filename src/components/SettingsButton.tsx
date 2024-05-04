@@ -2,13 +2,13 @@ import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCog, faBell } from '@fortawesome/free-solid-svg-icons';
 
-const YourComponent: React.FC = () => {
+const SettingsButton: React.FC = () => {
   return (
-    <div className="flex ml-44 text-2xl">
-      <FontAwesomeIcon icon={faCog} className="text-settingsAndbell-bg fixed top-2 -ml-10" size="sm" />
-      <FontAwesomeIcon icon={faBell} className="text-settingsAndbell-bg ml-0 fixed top-2" size="sm" />
+    <div className="text-2xl space-x-6 ml-44">
+      <FontAwesomeIcon icon={faCog} className="text-gray-500  "  />
+      <FontAwesomeIcon icon={faBell} className="text-gray-500  "  />
     </div>
   );
 };
 
-export default YourComponent;
+export default SettingsButton;

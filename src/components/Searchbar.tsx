@@ -1,7 +1,7 @@
 
  const Searchbar =() =>{
     return (
-        < div className=" mb-2 space-y-4 absolute text-sm text-black -left-10 bottom-96 -top-80 -mt-4">
+        < div className="space-y-4  text-sm text-black  ">
    
         <input type="text" 
         className="input border-none outline-none rounded-3xl

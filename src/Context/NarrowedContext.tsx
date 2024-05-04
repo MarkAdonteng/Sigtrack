@@ -1,5 +1,5 @@
 // NarrowContext.tsx
-import { createContext, useContext, ReactNode, useState } from 'react';
+import React, { createContext, useContext, ReactNode, useState } from 'react';
 
 interface NarrowContextProps {
   children: ReactNode;
@@ -10,13 +10,16 @@ interface NarrowContextValue {
   toggleIsNarrowed1: () => void;
 }
 
-const NarrowContext = createContext<NarrowContextValue | undefined>(undefined);
+const NarrowContext = createContext<NarrowContextValue>({
+  isNarrowed1: false,
+  toggleIsNarrowed1: () => {},
+});
 
 const NarrowProvider: React.FC<NarrowContextProps> = ({ children }) => {
   const [isNarrowed1, setIsNarrowed1] = useState(false);
 
   const toggleIsNarrowed1 = () => {
-    setIsNarrowed1((prev) => !prev);
+    setIsNarrowed1(prev => !prev);
   };
 
   const value: NarrowContextValue = {
@@ -27,7 +30,7 @@ const NarrowProvider: React.FC<NarrowContextProps> = ({ children }) => {
   return <NarrowContext.Provider value={value}>{children}</NarrowContext.Provider>;
 };
 
-const useNarrowContext = () => {
+const useNarrowContext = (): NarrowContextValue => {
   const context = useContext(NarrowContext);
 
   if (!context) {
