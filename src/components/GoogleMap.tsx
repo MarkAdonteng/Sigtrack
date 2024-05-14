@@ -6,6 +6,7 @@ import { db } from '../services/firebase';
 import { MemberData } from '../Context/TeamMembersContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons';
+import { useTeamId } from '../Context/TeamIdContext';
 
 const containerStyle: React.CSSProperties = {
   position: 'absolute',
@@ -26,39 +27,45 @@ const GoogleMapComponent: React.FC = () => {
   const [mapType, setMapType] = useState<MapType>(MapType.ROADMAP);
   const { teamMembers } = useTeamMembersContext();
   const [userMarkers, setUserMarkers] = useState<
-    { userId: string; position: { lat: number; lng: number }; memberData: MemberData }[]
+    { userId: string; position: { lat: number; lng: number }; memberData: MemberData; color: string }[]
   >([]);
   const [selectedMember, setSelectedMember] = useState<MemberData | null>(null);
   const [currentLocation, setCurrentLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const { teamId } = useTeamId();
 
   useEffect(() => {
     const fetchUserMarkers = async () => {
       try {
-        const markers = await Promise.all(
-          teamMembers.map(async (member) => {
-            try {
-              const userDoc = await getDoc(doc(db, 'users', member.userId));
-
-              if (userDoc.exists()) {
-                const userData = userDoc.data();
-                if (userData && userData.latitude && userData.longitude) {
-                  return {
-                    userId: member.userId,
-                    position: { lat: userData.latitude, lng: userData.longitude },
-                    memberData: member,
-                  };
+        const teamDoc = await getDoc(doc(db, 'Teams', teamId));
+        if (teamDoc.exists()) {
+          const teamData = teamDoc.data();
+          if (teamData && teamData.color) {
+            const markers = await Promise.all(
+              teamMembers.map(async (member) => {
+                try {
+                  const userDoc = await getDoc(doc(db, 'users', member.userId));
+                  if (userDoc.exists()) {
+                    const userData = userDoc.data();
+                    if (userData && userData.latitude && userData.longitude) {
+                      return {
+                        userId: member.userId,
+                        position: { lat: userData.latitude, lng: userData.longitude },
+                        memberData: member,
+                        color: teamData.color,
+                      };
+                    }
+                  }
+                } catch (error) {
+                  console.error(`Error fetching user data for userId: ${member.userId}`, error);
                 }
-              }
-            } catch (error) {
-              console.error(`Error fetching user data for userId: ${member.userId}`, error);
-            }
-            return null;
-          })
-        );
-
-        setUserMarkers(markers.filter((marker) => marker !== null) as any);
+                return null;
+              })
+            );
+            setUserMarkers(markers.filter((marker) => marker !== null) as any);
+          }
+        }
       } catch (error) {
-        console.error('Error fetching user markers:', error);
+        console.error('Error fetching team data:', error);
       }
     };
 
@@ -76,7 +83,7 @@ const GoogleMapComponent: React.FC = () => {
         console.error('Error getting current location:', error);
       }
     );
-  }, [teamMembers]);
+  }, [teamMembers, teamId]);
 
   const handleMarkerClick = (member: MemberData) => {
     setSelectedMember(member);
@@ -96,6 +103,7 @@ const GoogleMapComponent: React.FC = () => {
 
   const mapRef = React.useRef<google.maps.Map | null>(null);
 
+
   return (
     <LoadScript googleMapsApiKey="AIzaSyDkw3a_XLgmpbUFB1yuuNj3o5cFlhP7HCo">
       <div>
@@ -107,11 +115,7 @@ const GoogleMapComponent: React.FC = () => {
             zIndex: 0,
           }}
         >
-          <select
-            id="mapType"
-            onChange={(e) => setMapType(e.target.value as MapType)}
-            value={mapType}
-          >
+          <select id="mapType" onChange={(e) => setMapType(e.target.value as MapType)} value={mapType}>
             <option value={MapType.ROADMAP}>Roadmap</option>
             <option value={MapType.SATELLITE}>Satellite</option>
             <option value={MapType.HYBRID}>Hybrid</option>
@@ -133,8 +137,17 @@ const GoogleMapComponent: React.FC = () => {
               key={marker.userId}
               position={marker.position}
               onClick={() => handleMarkerClick(marker.memberData)}
+              icon={{
+                path: `M 0,0 L -10,-20 L 10,-20 Z`, // SVG path for a triangle pointing up
+                fillColor: marker.color,
+                fillOpacity: 1,
+                strokeWeight: 0,
+                scale: 1, // Adjust the size of the marker
+              }}
             />
           ))}
+
+          
 
           {currentLocation && (
             <Marker

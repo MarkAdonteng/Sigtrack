@@ -12,6 +12,7 @@ import { TeamMembersProvider } from './Context/TeamMembersContext';
 import { MemberProvider } from './Context/MemberIdContext';
 import { UserContextProvider } from './Context/LoggedInUserContext';
 import Layout from './layout/Layout';
+import { TeamContextProvider } from './Context/TeamsContext';
 
 const SigApp: React.FC = () => {
   const [isLoggedIn, setLoggedIn] = useState(false);
@@ -53,6 +54,7 @@ const SigApp: React.FC = () => {
   return (
     // Providers
     <LogoutProvider handleLogout={handleLogout}>
+      <TeamContextProvider>
       <SelectedMembersProvider>
         <TeamMembersProvider>
           <OrganizationProvider>
@@ -64,7 +66,7 @@ const SigApp: React.FC = () => {
                       {/* Conditional rendering */}
                       {isLoggedIn ? (
                         // Render Layout component when logged in
-                        <div className='flex flex-col h-screen '>
+                        <div className='flex flex-col h-screen font-lato'>
                           <Layout />
 
                           {/* Modal component */}
@@ -98,6 +100,7 @@ const SigApp: React.FC = () => {
           </OrganizationProvider>
         </TeamMembersProvider>
       </SelectedMembersProvider>
+      </TeamContextProvider>
     </LogoutProvider>
   );
 };

@@ -4,14 +4,15 @@ import AddMembersButton from '../../components/AddMembersButton';
 import { useTeamMembersContext } from '../../Context/TeamMembersContext';
 import TeamMembers from '../../components/TeamMembers';
 
-
-
-
 // Helper function to format the date
 const formatDate = (date: string | Date | undefined): string => {
-  if (!date) return ""; // Handle undefined or null dates
-  let dateObj = date instanceof Date ? date : new Date(date);
-  return dateObj.toLocaleDateString();
+  if (date instanceof Date) {
+    // If it's already a Date object, use it
+    return date.toLocaleDateString();
+  } else {
+    // Otherwise, assume it's a string and return it as is
+    return date || '';
+  }
 };
 
 const SecondSectionContent = () => {
@@ -38,7 +39,9 @@ const SecondSectionContent = () => {
 
   return (
     <div className="font-mono font-bold">
-      <TeamMembers teamMembers={teamMembers} formatDate={formatDate} />
+      {/* <TeamMembers teamMembers={teamMembers} formatDate={formatDate} /> */}
+      <TeamMembers formatDate={formatDate} />
+      
 
      
       <AddMembersButton onAddMembersClick={handleAddMembers} teamId='teamId' />

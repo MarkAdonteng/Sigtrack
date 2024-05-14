@@ -78,7 +78,9 @@ const TeamList: React.FC<TeamListProps> = ({ displayIconsOnly = false }) => {
   const { selectedMembers, dispatch } = useSelectedMembers();
   const [showConfirmDeleteForm, setShowConfirmDeleteForm] = useState(false);
   const [ConfirmDeleteformData, setConfirmDeleteFormData] = useState<{ name: string;teamId:string } | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+
+  const [selectedTeamIds, setSelectedTeamIds] = useState<string[]>([]);
 
 
   const [{ activeTeams, suspendedTeams }, teamsDispatch] = useReducer(teamsReducer, {
@@ -86,16 +88,24 @@ const TeamList: React.FC<TeamListProps> = ({ displayIconsOnly = false }) => {
     suspendedTeams: [],
   });
 
+    const toggleTeamSelection = (teamId: string) => {
+    setSelectedTeamIds((prevSelectedTeamIds) =>
+      prevSelectedTeamIds.includes(teamId)
+        ? prevSelectedTeamIds.filter((id) => id !== teamId) // Deselect if already selected
+        : [...prevSelectedTeamIds, teamId] // Select if not already selected
+    );
+  };
+
  // ...
  useEffect(() => {
   const fetchData = async () => {
-    const unsubscribe = onSnapshot(collection(db, 'Teams'), async (snapshot) => {
+    const teamsRef = collection(db, 'Teams');
+    const unsubscribe = onSnapshot(teamsRef, async (snapshot) => {
       const activeTeamsData: Team[] = [];
       const suspendedTeamsData: Team[] = [];
 
-      for (const doc of snapshot.docs) {
+      snapshot.forEach((doc) => {
         const { name, date_established, color, status, members, description, organization } = doc.data();
-
         const teamData: Team = {
           id: doc.id,
           name,
@@ -108,53 +118,24 @@ const TeamList: React.FC<TeamListProps> = ({ displayIconsOnly = false }) => {
           timestamp: Date.now(),
         };
 
-        try {
-          if (typeof organization === 'string') {
-            teamData.organization = organization;
-
-            // Check if the organization is equal to the entered organization
-            if (organization === enteredOrganization) {
-              if (status === 'active') {
-                activeTeamsData.push(teamData);
-              } else if (status === 'suspended') {
-                suspendedTeamsData.push(teamData);
-              }
-            }
-
-            console.log(`Organization is a string: ${organization}`);
-          } else if (organization instanceof DocumentReference) {
-            // If organization is a DocumentReference, fetch the document
-            const orgDoc = await getDoc(organization);
-
-            if (orgDoc.exists()) {
-              const orgData = orgDoc.data() as OrganizationDocument;
-
-              // Compare the organization name with the entered organization
-              if (orgData.name === enteredOrganization) {
-                if (status === 'active') {
-                  activeTeamsData.push(teamData);
-                } else if (status === 'suspended') {
-                  suspendedTeamsData.push(teamData);
-                }
-              }
-            } else {
-              console.error(`Organization document not found for team ${teamData.name}`);
-            }
-          } else {
-            console.error(`Unknown type for organization: ${organization}`);
+        if (organization === enteredOrganization) {
+          if (status === 'active') {
+            activeTeamsData.push(teamData);
+          } else if (status === 'suspended') {
+            suspendedTeamsData.push(teamData);
           }
-        } catch (error) {
-          console.error('Error fetching organization document:', error);
         }
-      }
+      });
 
       teamsDispatch({ type: 'SET_ACTIVE_TEAMS', payload: activeTeamsData });
       teamsDispatch({ type: 'SET_SUSPENDED_TEAMS', payload: suspendedTeamsData });
+
+      // Save data to local storage
       localStorage.setItem('activeTeams', JSON.stringify(activeTeamsData));
       localStorage.setItem('suspendedTeams', JSON.stringify(suspendedTeamsData));
     });
 
-    return () => unsubscribe();
+    return unsubscribe;
   };
 
   fetchData();
@@ -164,82 +145,77 @@ const TeamList: React.FC<TeamListProps> = ({ displayIconsOnly = false }) => {
 const { setTeamId } = useTeamId();
 
 
+
 const { setTeamMembers } = useTeamMembersContext();
 
 const handleTeamNameClick = async (members: DocumentReference[], teamId: string) => {
   try {
-    setLoading(true); // Set loading state to true at the beginning
+    setLoading(true);
+    console.log('Clicked Team ID:', teamId);
+    
 
-    console.log('Clicked Team ID:', teamId); // Log the teamId to the console
 
     const teamMembersData: MemberData[] = [];
-    let teamDateCreated: Date | undefined = new Date(Date.now()); // Initialize with the current date and time
+    let teamDateCreated: Date | undefined = new Date(Date.now());
 
-    if (members.length === 0) {
-      // If there are no members, set a default message
-      // teamMembersData.push({ name: 'No members in this team', dateCreated: '' });
-    } else {
-      // Assuming members is an array of DocumentReference
-      for (const memberRef of members) {
-        const userId = memberRef.id; // Extract user ID from the reference
-        const userDoc = await getDoc(doc(db, 'users', userId));
+    // Fetch members data for the clicked team
+    for (const memberRef of members) {
+      const userId = memberRef.id;
+      const userDoc = await getDoc(doc(db, 'users', userId));
 
-        if (userDoc.exists()) {
-          const userData = userDoc.data();
-          const memberName = userData?.name || '';
-          const memberCallSign = userData?.callSign || ''; // Assuming callSign is a string
-          const memberStatus = userData?.status || ''; // Assuming status is a string
-          const memberUserType = userData?.user_type || ''; // Assuming user_type is a string
-          const memberLongitude = userData?.longitude || 0; // Assuming longitude is a number
-          const memberLatitude = userData?.latitude || 0; // Assuming latitude is a number
-          const memberPassword = userData?.password || ''; 
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        const memberName = userData?.name || '';
+        const memberCallSign = userData?.callSign || '';
+        const memberStatus = userData?.status || '';
+        const memberUserType = userData?.user_type || '';
+        const memberLongitude = userData?.longitude || 0;
+        const memberLatitude = userData?.latitude || 0;
+        const memberPassword = userData?.password || '';
 
-          let memberDateCreated: string | Date = new Date(Date.now());
+        let memberDateCreated: string | Date = new Date(Date.now());
 
-          if ('dateCreated' in userData && userData.dateCreated !== undefined) {
-            const timestamp = userData.dateCreated.seconds * 1000;
-            memberDateCreated = new Date(timestamp);
-          } else {
-            memberDateCreated = userData?.dateCreated || '';
-          }
-
-          const memberUserId = userId; // Get the userId
-
-          teamMembersData.push({
-            name: memberName,
-            dateCreated: memberDateCreated,
-            userId: memberUserId,
-            callSign: memberCallSign,
-            status: memberStatus,
-            user_type: memberUserType,
-            longitude: memberLongitude,
-            latitude: memberLatitude,
-            password: memberPassword,
-          });
+        if ('dateCreated' in userData && userData.dateCreated !== undefined) {
+          const timestamp = userData.dateCreated.seconds * 1000;
+          memberDateCreated = new Date(timestamp);
+        } else {
+          memberDateCreated = userData?.dateCreated || '';
         }
+
+        const memberUserId = userId;
+
+        teamMembersData.push({
+          name: memberName,
+          dateCreated: memberDateCreated,
+          userId: memberUserId,
+          callSign: memberCallSign,
+          status: memberStatus,
+          user_type: memberUserType,
+          longitude: memberLongitude,
+          latitude: memberLatitude,
+          password: memberPassword,
+        });
       }
     }
 
-    if (isNarrowed1) {
+    if (!isNarrowed1) {
       toggleIsNarrowed1();
     }
-
+   
     setTeamMembers(teamMembersData);
+    // Update the context with the members of the clicked team
+    // setTeamMembers((prevTeamMembers) => [...prevTeamMembers, ...teamMembersData]);
     sessionStorage.setItem('selectedMembers', JSON.stringify(teamMembersData));
     sessionStorage.setItem('teamDateCreated', JSON.stringify(teamDateCreated));
 
-    dispatch({
-      type: 'SET_SELECTED_MEMBERS',
-      payload: `${teamMembersData.map((member) => `${member.name} - ${member.dateCreated} - ${member.userId}`).join(', ')}`,
-    });
-
+    setLoading(false);
     setTeamId(teamId);
-    setLoading(false); // Unset loading state when data fetching is completed
   } catch (error) {
     console.error('Error fetching user document:', error);
-    setLoading(false); // Unset loading state in case of error
+    setLoading(false);
   }
 };
+
 
 
 
@@ -396,13 +372,13 @@ const handleEditFormSubmit = async (updatedValues: Partial<Team>) => {
 
   return (
     <div className='font-latto '>
-       {/* {loading && (
-        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
+       {loading && (
+        <div className="fixed inset-0 z-50 bg-gray-800 bg-opacity-50 flex justify-center items-center">
           <div className="loader">Loading...</div>
         </div>
-      )} */}
+      )}
       <div className='-ml-8 '>
-      {isModalOpen && <div className='fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center '><AddTeamModal isOpen={isModalOpen}  onClose={closeModal} onSubmit={handleSubmitForm} /></div>}
+      {isModalOpen && <div className='fixed inset-0 z-50 bg-gray-800 bg-opacity-50 flex justify-center items-center '><AddTeamModal isOpen={isModalOpen}  onClose={closeModal} onSubmit={handleSubmitForm} /></div>}
       
       {editedTeam && (
        <EditTeamModal
@@ -454,7 +430,7 @@ const handleEditFormSubmit = async (updatedValues: Partial<Team>) => {
 
        {/* Display form when showForm is true */}
        {showConfirmDeleteForm && (
-        <div className="fixed inset-0 bg-gray-900 text-black bg-opacity-50 flex justify-center items-center text-sm">
+        <div className="fixed inset-0 z-50 bg-gray-900 text-black bg-opacity-50 flex justify-center items-center text-sm">
           <div className=' bg-gray-200 text-black w-96 text-center rounded-lg shadow-md p-6  text-sm'>
           <h2 className="text-lg font-semibold mb-2">Are you sure you want to delete {ConfirmDeleteformData?.name} </h2>
           <button onClick={handleConfirmDelete}
@@ -468,10 +444,10 @@ const handleEditFormSubmit = async (updatedValues: Partial<Team>) => {
      
       {/* <AddandEditButton onAddClick={handleAddButtonClick}  /> */}
       {!displayIconsOnly && (
-      <div className="flex absolute mt-[180px] right-0 ">
+      <div className="flex fixed bottom-1 right-3.5 font-lato font-bold">
         
             
-        <button className="bg-white text-black px-4 py-2 rounded text-sm w-64 "
+        <button className="bg-white text-black px-4 py-2 rounded text-sm w-72 "
        onClick={handleAddButtonClick} >
             Add Team
         </button>

@@ -27,6 +27,11 @@ const AddTeamModal: React.FC<AddTeamModalProps> = ({ isOpen, onClose, onSubmit }
     onClose();
   };
 
+  const handleTeamNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const capitalizedTeamName = e.target.value.charAt(0).toUpperCase() + e.target.value.slice(1);
+    setNewTeamName(capitalizedTeamName);
+  };
+
   return (
     <div className='fixed  bg-gray-200 text-black w-96 rounded-lg shadow-md p-6 text-sm font-lato'>
     <div className={`modal ${isOpen ? 'is-active' : ''}`}>
@@ -36,18 +41,17 @@ const AddTeamModal: React.FC<AddTeamModalProps> = ({ isOpen, onClose, onSubmit }
           <p className="modal-card-title text-center" >Enter Team Details</p>
         </header>
         <section className="modal-card-body">
-   <div className="field flex flex-col">
-  <label className="label">Team Name:</label>
-  <input
-    className="input bg-gray-100 text-gray-800 border-0 rounded-md p-2 mb-4 focus:bg-gray-200 transition ease-in-out duration-150"
-    type="text"
-    value={newTeamName}
-    onChange={(e) => setNewTeamName(e.target.value)}
-  />
-</div>
+          <div className="field flex flex-col space-y-1 mb-4">
+            <label className="label">Team Name:</label>
+            <input
+              className="input bg-gray-100 text-gray-800 border-0 rounded-md p-2 mb-4 focus:bg-gray-200 transition ease-in-out duration-150"
+              type="text"
+              value={newTeamName}
+              onChange={handleTeamNameChange}
+            />
+          </div>
 
-
-          <div className="field flex flex-col">
+          <div className="field flex flex-col space-y-1 mb-4">
             <label className='label'>Status:</label>
             <select 
               value={userEnteredStatus} 
@@ -60,7 +64,7 @@ const AddTeamModal: React.FC<AddTeamModalProps> = ({ isOpen, onClose, onSubmit }
             </select>
           </div>
 
-          <div className="field">
+          <div className="field space-y-1 mb-4">
             <label className="label">Color:</label>
             <input
               className="input bg-gray-100 text-gray-800 border-0 rounded-md p-2 mb-4 focus:bg-gray-200  transition ease-in-out duration-150"
@@ -70,10 +74,10 @@ const AddTeamModal: React.FC<AddTeamModalProps> = ({ isOpen, onClose, onSubmit }
             />
           </div>
           
-          <div className="field flex flex-col">
+          <div className="field flex flex-col space-y-1 mb-4">
             <label className="label">Description:</label>
             <textarea
-              className="input bg-gray-100 text-gray-800 border-0 ml-3 rounded-md p-2 mb-4 focus:bg-gray-200 transition ease-in-out duration-150" 
+              className="input bg-gray-100 text-gray-800 border-0  rounded-md p-2 mb-4 focus:bg-gray-200 transition ease-in-out duration-150" 
               value={userEnteredDescription}
               onChange={(e) => setUserEnteredDescription(e.target.value)}
             />

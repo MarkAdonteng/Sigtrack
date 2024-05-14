@@ -19,30 +19,34 @@ const EditMemberModal: React.FC<{
   const [editedPassword, setEditedPassword] = useState(member?.password || '');
 
   const handleSubmit = () => {
+    // Capitalize the first letter of the editedName
+    const capitalizedEditedName = editedName.charAt(0).toUpperCase() + editedName.slice(1);
+  
     const updatedValues: Partial<MemberData> = {
-      name: editedName,
+      name: capitalizedEditedName,
       callSign: editedCallSign,
       latitude: editedLatitude,
-      longitude:editedLongitude,
+      longitude: editedLongitude,
       status: editedStatus as "active" | "suspended" | undefined,
       user_type: editedUser_Type as "admin" | "user" | undefined,
-      password:editedPassword,
+      password: editedPassword,
     };
-
+  
     onSubmit(updatedValues);
   };
+  
 
   return (
     // Your modal UI
 
-    <div className='fixed inset-0 bg-gray-900 text-black bg-opacity-50 flex justify-center items-center text-sm font-lato'>
+    <div className='fixed inset-0 z-50 bg-gray-800 bg-opacity-50 flex justify-center items-center'>
     <div className={`modal ${isOpen ? 'open' : 'closed'}`}>
       <div className="modal-content bg-gray-200 text-black w-96 rounded-lg shadow-md p-6 text-sm">
         <h2 className='text-center'>Edit Member Details</h2>
 
    
 
-        <div className="field flex flex-col">
+        <div className="field flex flex-col space-y-1 mb-4">
   <label className="label">Name:</label>
   <input
     className="input bg-gray-100 text-gray-800 border-0 rounded-md p-2 mb-4 focus:bg-gray-200 transition ease-in-out duration-150"
@@ -54,8 +58,8 @@ const EditMemberModal: React.FC<{
 
 
 
-        <div className="field flex flex-col">
-  <label className="label">Team Name:</label>
+        <div className="field flex flex-col space-y-1 mb-4">
+  <label className="label">Call Sign:</label>
   <input
     className="input bg-gray-100 text-gray-800 border-0 rounded-md p-2 mb-4 focus:bg-gray-200 transition ease-in-out duration-150"
     type="text"
@@ -64,27 +68,28 @@ const EditMemberModal: React.FC<{
   
 </div>
 
-          <div className="field flex flex-col">
-  <label className="label">Team Name:</label>
+<div className="field flex flex-col space-y-1 mb-4">
+  <label className="label">Longitude:</label>
   <input
     className="input bg-gray-100 text-gray-800 border-0 rounded-md p-2 mb-4 focus:bg-gray-200 transition ease-in-out duration-150"
     type="text"
     value={editedLongitude}
-    onChange={(e) => setEditedLongitude(parseFloat(e.target.value))}
+    onChange={(e) => setEditedLongitude(parseFloat(e.target.value.replace(',', '.')))}
   />
 </div>
 
-          <div className="field flex flex-col">
-  <label className="label">Team Name:</label>
+<div className="field flex flex-col space-y-1 mb-4">
+  <label className="label">Latitude:</label>
   <input
     className="input bg-gray-100 text-gray-800 border-0 rounded-md p-2 mb-4 focus:bg-gray-200 transition ease-in-out duration-150"
     type="text"
     value={editedLatitude}
-    onChange={(e) => setEditedLatitude(parseFloat(e.target.value))}
+    onChange={(e) => setEditedLatitude(parseFloat(e.target.value.replace(',', '.')))}
   />
 </div>
 
-        <div className="field flex flex-col">
+
+        <div className="field flex flex-col space-y-1 mb-4">
             <label className='label'>Status:</label>
             <select value={editedStatus}  
               className='input bg-gray-100 text-gray-800 border-0 rounded-md p-2 mb-4 focus:bg-gray-200  transition ease-in-out duration-150'
@@ -96,7 +101,7 @@ const EditMemberModal: React.FC<{
             </select>
           </div>
 
-        <div className="field flex flex-col">
+        <div className="field flex flex-col space-y-1 mb-4">
             <label className='label'> User Type:</label>
             <select value={editedUser_Type} 
               className='input bg-gray-100 text-gray-800 border-0 rounded-md p-2 mb-4 focus:bg-gray-200  transition ease-in-out duration-150'
@@ -107,7 +112,7 @@ const EditMemberModal: React.FC<{
           </select>
           </div>
 
-        <div className="field flex flex-col">
+        <div className="field flex flex-col space-y-1 mb-4">
   <label className="label">Password:</label>
   <input
     className="input bg-gray-100 text-gray-800 border-0 rounded-md p-2 mb-4 focus:bg-gray-200 transition ease-in-out duration-150"

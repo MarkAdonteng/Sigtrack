@@ -25,11 +25,11 @@ const RightLayout: React.FC<RightLayoutProps> = ({ children }) => {
 
   return (
     <div
-      className={`third-section bg-gray-300 w-${isNarrowed ? '16' : '80'} ml-8 bottom-0 min-h-full z-20 right-0 absolute  transition-width flex justify-center items-center max-h-[96vh] text-alternate-text duration-100 ease-in-out overflow-${isNarrowed ? 'hidden' : 'visible'} ${isNarrowed ? 'w-10' : 'auto'} ${isNarrowed ? 'h-auto' : 'h-full'} flex flex-col`}
+      className={`third-section bg-gray-300 w-${isNarrowed ? '16' : '80'} ml-8 bottom-0 min-h-full z-1 right-0 absolute  transition-width flex justify-center items-center max-h-[96vh] text-alternate-text duration-100 ease-in-out overflow-${isNarrowed ? 'hidden' : 'visible'} ${isNarrowed ? 'w-10' : 'auto'} ${isNarrowed ? 'h-auto' : 'h-full'} flex flex-col`}
     >
       <div>
         <button
-          className={`arrow-button3 ${rotation === 180 ? 'rotate' : ''} text-2xl text-gray-500 text-center transform transition-transform duration-100 ease-in-out absolute border-none shadow-none bg-transparent ${isNarrowed ? 'top-4 right-6' : 'top-4 left-3.5'}`}
+          className={`arrow-button3 ${rotation === 180 ? 'rotate' : ''} text-xl text-gray-500 text-center transform transition-transform duration-100 ease-in-out absolute border-none shadow-none bg-transparent ${isNarrowed ? 'top-4 right-6' : 'top-4 left-3.5'}`}
           onClick={handleButtonClick}
           style={{ transform: `rotate(${rotation}deg)` }}
         >

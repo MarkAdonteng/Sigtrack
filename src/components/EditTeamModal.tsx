@@ -16,28 +16,32 @@ const EditTeamModal: React.FC<{
   const [editedStatus, setEditedStatus] = useState(team?.status || '');
 
   const handleSubmit = () => {
+    // Capitalize the first letter of the editedName
+    const capitalizedEditedName = editedName.charAt(0).toUpperCase() + editedName.slice(1);
+  
     const updatedValues: Partial<Team> = {
-      name: editedName,
+      name: capitalizedEditedName,
       description: editedDescription,
       color: editedColor,
       status: editedStatus as "active" | "suspended" | undefined,
     };
-
+  
     onSubmit(updatedValues);
   };
+  
 
   return (
 
     
     // Your modal UI
-    <div className='fixed inset-0 bg-gray-900 text-black bg-opacity-50 flex justify-center items-center text-sm'>
+    <div className='fixed inset-0 z-50 bg-gray-900 text-black bg-opacity-50 flex justify-center items-center text-sm'>
     <div className={`modal ${isOpen ? 'open' : 'closed'}`}>
       <div className=" bg-gray-200 text-black w-96 rounded-lg shadow-md p-6 text-sm">
         <h2 className='text-center'>Edit Team Details</h2>
 
      
       
-        <div className="field flex flex-col">
+        <div className="field flex flex-col space-y-1 mb-4">
   <label className="label">Team Name:</label>
   <input
     className="input bg-gray-100 text-gray-800 border-0 rounded-md p-2 mb-4 focus:bg-gray-200 transition ease-in-out duration-150"
@@ -48,7 +52,7 @@ const EditTeamModal: React.FC<{
 </div>
 
 
-        <div className="field">
+        <div className="field space-y-1 mb-4">
             <label className="label">Color:</label>
             <input
               className="input bg-gray-100 text-gray-800 border-0 rounded-md p-2 mb-4 focus:bg-gray-200  transition ease-in-out duration-150"
@@ -60,7 +64,7 @@ const EditTeamModal: React.FC<{
 
 
 
-        <div className="field flex flex-col">
+        <div className="field flex flex-col space-y-1 mb-4">
             <label className='label'>Status:</label>
             <select value={editedStatus}  
               className='input bg-gray-100 text-gray-800 border-0 rounded-md p-2 mb-4 focus:bg-gray-200  transition ease-in-out duration-150'
@@ -73,10 +77,10 @@ const EditTeamModal: React.FC<{
           </div>
 
 
-        <div className="field flex flex-col">
+        <div className="field flex flex-col space-y-1 mb-4">
             <label className="label">Description:</label>
             <textarea
-              className="input bg-gray-100 text-gray-800 border-0 ml-3 rounded-md p-2 mb-4 focus:bg-gray-200 transition ease-in-out duration-150" 
+              className="input bg-gray-100 text-gray-800 border-0 rounded-md p-2 mb-4 focus:bg-gray-200 transition ease-in-out duration-150" 
               value={editedDescription}
               onChange={(e) => setEditedDescription(e.target.value)}
             />

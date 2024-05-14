@@ -107,7 +107,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
   };
   
   return (
-    <div className="flex items-center justify-center h-screen">
+    <div className="flex items-center justify-center h-screen font-lato">
       {showLoginForm ? (
         <div className="text-center justify-center w-96 h-[450px] bg-[rgb(217,_217,_217)] rounded-[60px]">
           <img

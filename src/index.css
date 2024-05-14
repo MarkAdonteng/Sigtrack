@@ -149,6 +149,8 @@ img {
     5% { transform: translateX(5%); } /* Text reappears from behind */
     100% { transform: translateX(0%); } /* Reset */
   }
+
+  
   
   
 

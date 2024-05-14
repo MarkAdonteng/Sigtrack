@@ -1,75 +1,60 @@
-import React, { useState, useRef, useEffect } from 'react';
+// TeamMemberItem.tsx
+import React from 'react';
+import { RiPencilFill, RiDeleteBin6Line } from 'react-icons/ri';
+import { MemberData } from '../Context/TeamMembersContext';
 
-export type TeamMemberModel = {
-  lat: string;
-  lng: string;
-  id: number;
-  name: string;
-  username: string;
-};
+interface TeamMemberItemProps {
+  member: MemberData;
+  formatDate: (date: string | Date | undefined) => string;
+  teamColor: string;
+  onEditClick: (userId: string) => void;
+  onDeleteClick: (userId: string) => void;
+  onMemberClick: (name: string, dateCreated: string | Date) => void; // New prop for handling member click
+  onEditModalOpen: (member: MemberData) => void; // New prop for opening edit modal
+}
 
-const TeamMemberItem: React.FC<TeamMemberModel> = (teamMemberItemProps: TeamMemberModel) => {
-  const [isClicked, setIsClicked] = useState(false);
-  const [textInput, setTextInput] = useState('');
-  const icon = teamMemberItemProps.name.charAt(0).toUpperCase();
-  const popupRef = useRef<HTMLDivElement>(null);
-
+const TeamMemberItem: React.FC<TeamMemberItemProps> = ({
+  member,
+  formatDate,
+  teamColor,
+  onEditClick,
+  onDeleteClick,
+  onMemberClick,
+  onEditModalOpen,
+}) => {
   const handleClick = () => {
-    setIsClicked(!isClicked);
+    // Call onMemberClick with member details
+    onMemberClick(member.name, member.dateCreated);
   };
-
-  const handleTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setTextInput(event.target.value);
-  };
-
-  const handleDocumentClick = (event: MouseEvent) => {
-    if (popupRef.current && !popupRef.current.contains(event.target as Node)) {
-      setIsClicked(false);
-    }
-  };
-
-  useEffect(() => {
-    document.addEventListener('mousedown', handleDocumentClick);
-
-    return () => {
-      document.removeEventListener('mousedown', handleDocumentClick);
-    };
-  }, []);
 
   return (
-    <div className={`relative ${isClicked ? 'selected' : ''}`}>
-      <h1 className="-mt-80 fixed font-bold text-primary-text -ml-32">Team Members</h1>
-      <div className="left-44 top-0 mt-24 fixed font-semibold text-primary-text mb-4 flex items-center justify-center">
-        <div className={`bg-red-500 text-white rounded-md p-2 w-8 h-8 mr-2 flex items-center justify-center group cursor-pointer ${isClicked ? 'group-selected' : ''}`} onClick={handleClick}>
-          {icon}
+    <div className="flex items-center mb-4" onClick={handleClick}>
+      <div
+        style={{ backgroundColor: teamColor }}
+        className="text-white rounded-md p-2 w-8 h-8 mr-2 flex items-center justify-center font-lato cursor-pointer"
+        onClick={() => onEditClick(member.userId)}
+      >
+        {member.name.charAt(0)}
+      </div>
+      <div className="flex flex-col">
+        <div
+          className="text-sm font-bold cursor-pointer"
+          onClick={() => onEditClick(member.userId)}
+        >
+          {member.name}
         </div>
-        <div>
-          <div className="text-sm relative">
-            <span className={`inline-block relative cursor-pointer group ${isClicked ? 'group-selected' : ''}`} onClick={handleClick}>
-              {teamMemberItemProps.name}
-            </span>
-            {isClicked && (
-              <div ref={popupRef} className="absolute w-72 top-0 left-60 text-black bg-white border border-gray-300 p-2 rounded whitespace-pre">
-                <div>
-                  Name: {teamMemberItemProps.name} <br />
-                  Call Sign: {teamMemberItemProps.username}
-                </div>
-                <div className="mt-2">
-                  <label htmlFor="textBox">Additional Information:</label>
-                  <input
-                    type="text"
-                    id="textBox"
-                    value={textInput}
-                    onChange={handleTextChange}
-                    className="border border-gray-300 p-1 rounded w-28"
-                  />
-                </div>
-              </div>
-            )}
-          </div>
-          <div className={`text-xs ${isClicked ? 'opacity-100' : ''}`} style={{ color: '#708090' }}>
-            {teamMemberItemProps.lat} minutes
-          </div>
+        <div className="flex items-center absolute space-x-2 ml-36 mt-1">
+          <RiPencilFill
+            className="text-primary cursor-pointer text-gray-500"
+            onClick={() => onEditModalOpen(member)} // Call onEditModalOpen with member data
+          />
+          <RiDeleteBin6Line
+            className="text-red-500 cursor-pointer"
+            onClick={() => onDeleteClick(member.userId)}
+          />
+        </div>
+        <div className="text-xs text-gray-500">
+          {formatDate(member.dateCreated)}
         </div>
       </div>
     </div>
