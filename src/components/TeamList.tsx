@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useReducer } from 'react';
 import { collection, onSnapshot, getDoc,updateDoc,deleteDoc, DocumentReference, doc,addDoc } from 'firebase/firestore';
 import db from '../services/Firestore';
-import { useSelectedMembers } from '../Context/membersContext';
+// import { useSelectedMembers } from '../Context/membersContext';
 import { useNarrowContext } from '../Context/NarrowedContext';
 import AddTeamModal from './AddTeamModal';
 import { RiPencilFill, RiDeleteBin6Line } from 'react-icons/ri';
@@ -10,6 +10,8 @@ import { useTeamId } from '../Context/TeamIdContext';
 import { useTeamMembersContext } from '../Context/TeamMembersContext';
 import { useOrganizationContext } from '../Context/organizationContext';
 import TeamItem from './TeamItem';
+import { useLoading } from '../Context/LoadingContext';
+import { useTeamsContext } from '../Context/TeamsContext';
 
 
 
@@ -75,12 +77,14 @@ const TeamList: React.FC<TeamListProps> = ({ displayIconsOnly = false }) => {
 
   const { enteredOrganization } = useOrganizationContext();
   const { isNarrowed1, toggleIsNarrowed1 } = useNarrowContext();
-  const { selectedMembers, dispatch } = useSelectedMembers();
+  // const { selectedMembers, dispatch } = useSelectedMembers();
   const [showConfirmDeleteForm, setShowConfirmDeleteForm] = useState(false);
   const [ConfirmDeleteformData, setConfirmDeleteFormData] = useState<{ name: string;teamId:string } | null>(null);
-  const [loading, setLoading] = useState(false);
+  const { isLoading, setLoading } = useLoading();
 
   const [selectedTeamIds, setSelectedTeamIds] = useState<string[]>([]);
+  const [showInternetConnectionForm, setShowInternetConnectionForm] = useState(false);
+  const { teamNames } = useTeamsContext();
 
 
   const [{ activeTeams, suspendedTeams }, teamsDispatch] = useReducer(teamsReducer, {
@@ -139,7 +143,9 @@ const TeamList: React.FC<TeamListProps> = ({ displayIconsOnly = false }) => {
   };
 
   fetchData();
-}, [enteredOrganization, dispatch, teamsDispatch]);
+}, [enteredOrganization, teamsDispatch]);
+
+
 
 
 const { setTeamId } = useTeamId();
@@ -153,14 +159,27 @@ const handleTeamNameClick = async (members: DocumentReference[], teamId: string)
     setLoading(true);
     console.log('Clicked Team ID:', teamId);
     
-
+    if (!isNarrowed1) {
+      toggleIsNarrowed1();
+    }
+   
+    // Set a flag to track whether the loading state persists after 10 seconds
+    let timeoutFlag = false;
+    
+    // Start a timer to check loading state after 10 seconds
+    const timeout = setTimeout(() => {
+      // If loading state persists after 10 seconds, set the flag to true
+      timeoutFlag = true;
+    }, 10000);
 
     const teamMembersData: MemberData[] = [];
     let teamDateCreated: Date | undefined = new Date(Date.now());
 
     // Fetch members data for the clicked team
     for (const memberRef of members) {
-      const userId = memberRef.id;
+      const userId = memberRef.id; 
+     
+
       const userDoc = await getDoc(doc(db, 'users', userId));
 
       if (userDoc.exists()) {
@@ -198,26 +217,24 @@ const handleTeamNameClick = async (members: DocumentReference[], teamId: string)
       }
     }
 
-    if (!isNarrowed1) {
-      toggleIsNarrowed1();
-    }
-   
+    // Clear the timeout since the data fetching is successful
+    clearTimeout(timeout);
+  
     setTeamMembers(teamMembersData);
-    // Update the context with the members of the clicked team
-    // setTeamMembers((prevTeamMembers) => [...prevTeamMembers, ...teamMembersData]);
     sessionStorage.setItem('selectedMembers', JSON.stringify(teamMembersData));
     sessionStorage.setItem('teamDateCreated', JSON.stringify(teamDateCreated));
 
     setLoading(false);
     setTeamId(teamId);
+
+    if (timeoutFlag) {
+      setShowInternetConnectionForm(true);
+    }
   } catch (error) {
     console.error('Error fetching user document:', error);
     setLoading(false);
   }
 };
-
-
-
 
 const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -299,6 +316,7 @@ const handleDeleteButtonClick = async (teamId: string) => {
 
 const handleConfirmDelete = async () => {
   try {
+    setLoading(true);
     // Delete the team document from Firestore using the selected team ID
     await deleteDoc(doc(db, 'Teams', selectedTeamId || ''));
     
@@ -316,6 +334,7 @@ const handleConfirmDelete = async () => {
     // Reset selected team ID and close the confirmation form
     setSelectedTeamId(null);
     setShowConfirmDeleteForm(false);
+    setLoading(false);
 
     console.log('Team deleted successfully:', selectedTeamId);
   } catch (error) {
@@ -352,16 +371,17 @@ const handleEditButtonClick = (teamId: string) => {
   }
 };
 
-
 const handleEditFormSubmit = async (updatedValues: Partial<Team>) => {
   console.log('Form submitted with updated values:', updatedValues);
   try {
+    setLoading(true);
     // Update the team document in Firestore
     const teamRef = doc(db, 'Teams', editedTeam?.id || '');
     await updateDoc(teamRef, updatedValues);
     console.log('Team updated successfully:', editedTeam?.id);
     // Close the modal
     closeEditModal();
+    setLoading(false);
     // Update the UI by fetching the latest data if needed
     // fetchData();
   } catch (error) {
@@ -371,12 +391,15 @@ const handleEditFormSubmit = async (updatedValues: Partial<Team>) => {
 
 
   return (
-    <div className='font-latto '>
-       {loading && (
-        <div className="fixed inset-0 z-50 bg-gray-800 bg-opacity-50 flex justify-center items-center">
-          <div className="loader">Loading...</div>
-        </div>
-      )}
+    <div className='font-latto overflow-hidden'>
+      <div className='overflow-y-auto'style={{ maxHeight: 'calc(700px - 1rem)', width: '120%' }}>
+      
+      {showInternetConnectionForm && <div className="fixed inset-0 z-50 bg-gray-900 text-black bg-opacity-50 flex justify-center items-center text-sm">
+    <div className='bg-gray-200 text-black w-96 text-center rounded-lg shadow-md p-6  text-sm'>
+      <h2 className="text-lg font-semibold mb-2">You internet connection</h2>
+      <button onClick={() => setShowInternetConnectionForm(false)} className='w-20 bg-white text-black font-bold rounded-md h-10 mt-6 mr-10 hover:bg-gray-300'>Close</button>
+    </div>
+  </div>}
       <div className='-ml-8 '>
       {isModalOpen && <div className='fixed inset-0 z-50 bg-gray-800 bg-opacity-50 flex justify-center items-center '><AddTeamModal isOpen={isModalOpen}  onClose={closeModal} onSubmit={handleSubmitForm} /></div>}
       
@@ -394,7 +417,7 @@ const handleEditFormSubmit = async (updatedValues: Partial<Team>) => {
       )}
       </div>
            <div className='space-y-2'>
-      {!displayIconsOnly && <h2 className="font-bold font-lato text-black ">Active Teams</h2>}
+      {!displayIconsOnly && <h2 className="font-bold font-lato text-black  ">Active Teams</h2>}
       <ul>
       {activeTeams.map((team) => (
         <TeamItem
@@ -404,12 +427,16 @@ const handleEditFormSubmit = async (updatedValues: Partial<Team>) => {
           onDelete={handleDeleteButtonClick}
           onTeamClick={handleTeamNameClick}
           displayIconsOnly={displayIconsOnly}
+          style={{ backgroundColor: teamNames.includes(team.name) ? '#f3f4f6' : 'inherit' }}
         />
       ))}
+       
     </ul>
 
+    <hr className='w-[250px] space-y-8  '></hr>
+    
 
-      <hr className='w-[250px] space-y-8  '></hr>
+    
       
 <div className='space-y-2'>
       {!displayIconsOnly && <h2 className="font-bold  font-lato text-black ">Suspended Teams</h2>}
@@ -422,6 +449,7 @@ const handleEditFormSubmit = async (updatedValues: Partial<Team>) => {
           onDelete={handleDeleteButtonClick}
           onTeamClick={handleTeamNameClick}
           displayIconsOnly={displayIconsOnly}
+          style={{ backgroundColor: teamNames.includes(team.name) ? '#f3f4f6' : 'inherit' }}
         />
       ))}
     </ul>
@@ -440,6 +468,7 @@ const handleEditFormSubmit = async (updatedValues: Partial<Team>) => {
         </div>
         </div>
       )}
+      </div>
 
      
       {/* <AddandEditButton onAddClick={handleAddButtonClick}  /> */}

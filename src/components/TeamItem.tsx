@@ -9,10 +9,19 @@ interface TeamItemProps {
   onDelete: (teamId: string) => void;
   onTeamClick: (members: DocumentReference[], teamId: string) => void;
   displayIconsOnly?: boolean;
+  style?: React.CSSProperties;
 }
 
-const TeamItem: React.FC<TeamItemProps> = ({ team, onEdit, onDelete, onTeamClick, displayIconsOnly }) => {
+const TeamItem: React.FC<TeamItemProps> = ({
+  team,
+  onEdit,
+  onDelete,
+  onTeamClick,
+  displayIconsOnly,
+  style
+}) => {
   const [isHovering, setIsHovering] = useState(false);
+  const [isClicked, setIsClicked] = useState(false);
 
   const handleMouseEnter = () => {
     setIsHovering(true);
@@ -20,6 +29,11 @@ const TeamItem: React.FC<TeamItemProps> = ({ team, onEdit, onDelete, onTeamClick
 
   const handleMouseLeave = () => {
     setIsHovering(false);
+  };
+
+  const handleClick = () => {
+    setIsClicked(!isClicked);
+    onTeamClick(team.members, team.id);
   };
 
   const renderTeamName = () => {
@@ -43,39 +57,44 @@ const TeamItem: React.FC<TeamItemProps> = ({ team, onEdit, onDelete, onTeamClick
     }
   };
 
-  return (
-    <li className="flex items-center mb-2 cursor-pointer font-lato justify-center align-center">
-      {displayIconsOnly ? (
+  if (displayIconsOnly) {
+    return (
+      <li className="flex items-center mb-4 cursor-pointer font-lato justify-center align-center" style={style}>
         <div
           className="rounded-md p-2 w-8 h-8 mr-2 flex items-center justify-center"
           style={{ backgroundColor: team.color || 'brown', color: 'white' }}
-          onClick={() => onTeamClick(team.members, team.id)}
+          onClick={handleClick}
         >
           {team.name.charAt(0)}
         </div>
-      ) : (
-        <>
-          <div
-            className="rounded-md p-2 w-8 h-8 mr-2 flex items-center justify-center"
-            style={{ backgroundColor: team.color || 'brown', color: 'white' }}
-            onClick={() => onTeamClick(team.members, team.id)}
-          >
-            {team.name.charAt(0)}
+      </li>
+    );
+  }
+
+  return (
+    <li
+      className="flex items-center mb-2 cursor-pointer font-lato justify-center relative align-center"
+      style={style}
+    >
+      <div
+        className="rounded-md p-2 w-8 h-8 mr-2 flex items-center justify-center"
+        style={{ backgroundColor: team.color || 'brown', color: 'white' }}
+        onClick={handleClick}
+      >
+        {team.name.charAt(0)}
+      </div>
+      <div className="flex-grow flex items-center" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+        <div onClick={handleClick}>
+          {renderTeamName()}
+          <div className="text-xs text-gray-500">
+            {team.date_established?.seconds && new Date(team.date_established.seconds * 1000).toLocaleDateString()}
           </div>
-          <div className="flex-grow flex items-center" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
-            <div onClick={() => onTeamClick(team.members, team.id)}>
-              {renderTeamName()}
-              <div className="text-xs text-gray-500">
-                {team.date_established?.seconds && new Date(team.date_established.seconds * 1000).toLocaleDateString()}
-              </div>
-            </div>
-            <div className="flex ml-[150px] absolute space-x-2">
-              <RiPencilFill className="text-primary cursor-pointer text-gray-500" onClick={() => onEdit(team.id)} />
-              <RiDeleteBin6Line className="text-red-500 cursor-pointer" onClick={() => onDelete(team.id)} />
-            </div>
-          </div>
-        </>
-      )}
+        </div>
+        <div className="flex ml-[150px] absolute space-x-2">
+          <RiPencilFill className="text-primary cursor-pointer text-gray-500" onClick={() => onEdit(team.id)} />
+          <RiDeleteBin6Line className="text-red-500 cursor-pointer" onClick={() => onDelete(team.id)} />
+        </div>
+      </div>
     </li>
   );
 };

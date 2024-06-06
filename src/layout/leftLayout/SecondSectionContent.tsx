@@ -1,50 +1,40 @@
-import React, { useEffect} from 'react';
-import { useSelectedMembers } from '../../Context/membersContext';
-import AddMembersButton from '../../components/AddMembersButton';
+import React, { useState } from 'react';
 import { useTeamMembersContext } from '../../Context/TeamMembersContext';
-import TeamMembers from '../../components/TeamMembers';
+import CustomMarkers from '../../components/CustomMarker';
+import { useCustomMarkerContext } from '../../Context/CustomMarkerContext';
+import TeamData from '../../components/TeamData';
 
-// Helper function to format the date
-const formatDate = (date: string | Date | undefined): string => {
-  if (date instanceof Date) {
-    // If it's already a Date object, use it
-    return date.toLocaleDateString();
-  } else {
-    // Otherwise, assume it's a string and return it as is
-    return date || '';
-  }
-};
+
+// // Helper function to format the date
+// const formatDate = (date: string | Date | undefined): string => {
+//   if (date instanceof Date) {
+//     // If it's already a Date object, use it
+//     return date.toLocaleDateString();
+//   } else {
+//     // Otherwise, assume it's a string and return it as is
+//     return date || '';
+//   }
+// };
 
 const SecondSectionContent = () => {
-  const { selectedMembers, dispatch } = useSelectedMembers();
   const { teamMembers } = useTeamMembersContext();
+  const { displayCustomMarker } = useCustomMarkerContext();
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
 
-  useEffect(() => {
-    // Save selectedMembers to local storage
-    localStorage.setItem('selectedMembers', JSON.stringify(selectedMembers));
-  }, [selectedMembers]);
-
-  useEffect(() => {
-    // Load selectedMembers from local storage
-    const loadedSelectedMembers = localStorage.getItem('selectedMembers');
-    if (loadedSelectedMembers) {
-      dispatch({ type: 'SET_SELECTED_MEMBERS', payload: JSON.parse(loadedSelectedMembers) });
-    }
-  }, [dispatch]);
-
-  const handleAddMembers = async () => {
-    // Add logic for adding members
+  const handleSelectImage = (url: string) => {
+    setSelectedImage(url);
   };
-
   return (
     <div className="font-mono font-bold">
-      {/* <TeamMembers teamMembers={teamMembers} formatDate={formatDate} /> */}
-      <TeamMembers formatDate={formatDate} />
-      
+      {/* Conditionally render either TeamMembers or CustomMarkers */}
+      {/* <TeamMembers formatDate={formatDate} /> */}
+      {displayCustomMarker ? <CustomMarkers onSelectImage={handleSelectImage} /> : <TeamData/>}
 
-     
-      <AddMembersButton onAddMembersClick={handleAddMembers} teamId='teamId' />
+      {/* AddMembersButton can be rendered outside the conditional rendering */}
+      {/* <div className='fixed bottom-0'>
+        <AddMembersButton onAddMembersClick={handleAddMembers} teamId='teamId' />
+      </div> */}
     </div>
   );
 };

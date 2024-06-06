@@ -1,7 +1,7 @@
 // App.tsx
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import './App.css';
-import { SelectedMembersProvider } from './Context/membersContext';
+// import { SelectedMembersProvider } from './Context/membersContext';
 import { NarrowProvider } from './Context/NarrowedContext';
 import LoginPage from './pages/LoginPage/Login';
 import GoogleAuth from './components/GoogleAuth';
@@ -12,7 +12,14 @@ import { TeamMembersProvider } from './Context/TeamMembersContext';
 import { MemberProvider } from './Context/MemberIdContext';
 import { UserContextProvider } from './Context/LoggedInUserContext';
 import Layout from './layout/Layout';
-import { TeamContextProvider } from './Context/TeamsContext';
+import { TeamsProvider } from './Context/TeamsContext';
+import { Provider } from 'react-redux';
+import store from './redux/teamDataStore'
+import { MarkerContextProvider } from './Context/SelectedCustomMarkeContext';
+import { CustomMarkerProvider } from './Context/CustomMarkerContext';
+import { LoadingProvider } from './Context/LoadingContext';
+import { TeamDataProvider } from './Context/TeamDataContext';
+import { MembersProvider } from './Context/membersContext';
 
 const SigApp: React.FC = () => {
   const [isLoggedIn, setLoggedIn] = useState(false);
@@ -27,6 +34,13 @@ const SigApp: React.FC = () => {
 
     setLoggedIn(true);
   };
+
+  useEffect(() => {
+    localStorage.setItem('isLoggedIn', JSON.stringify(isLoggedIn));
+  }, [isLoggedIn]);
+
+  const storedLoggedIn = localStorage.getItem('isLoggedIn');
+  
 
   const handleGoogleLogin = () => {
     console.log('Attempting Google login....');
@@ -54,14 +68,20 @@ const SigApp: React.FC = () => {
   return (
     // Providers
     <LogoutProvider handleLogout={handleLogout}>
-      <TeamContextProvider>
-      <SelectedMembersProvider>
+      <Provider store={store}>
+        <LoadingProvider>
+      {/* <SelectedMembersProvider> */}
+      <MembersProvider>
         <TeamMembersProvider>
           <OrganizationProvider>
             <NarrowProvider>
               <TeamIdProvider>
                 <MemberProvider>
                   <UserContextProvider>
+                    <CustomMarkerProvider>
+                  <MarkerContextProvider>
+                    <TeamsProvider>
+                      <TeamDataProvider>
                     <div>
                       {/* Conditional rendering */}
                       {isLoggedIn ? (
@@ -93,14 +113,20 @@ const SigApp: React.FC = () => {
                         )
                       )}
                     </div>
+                    </TeamDataProvider>
+                    </TeamsProvider>
+                    </MarkerContextProvider>
+                    </CustomMarkerProvider>
                   </UserContextProvider>
                 </MemberProvider>
               </TeamIdProvider>
             </NarrowProvider>
           </OrganizationProvider>
         </TeamMembersProvider>
-      </SelectedMembersProvider>
-      </TeamContextProvider>
+        </MembersProvider>
+      {/* </SelectedMembersProvider> */}
+      </LoadingProvider>
+      </Provider>
     </LogoutProvider>
   );
 };

@@ -1,42 +1,46 @@
-// src/context/SelectedMembersContext.tsx
+import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-import React, { createContext, useContext, ReactNode, useReducer } from 'react';
-
-// Define action types
-type ActionType = 
-  | { type: 'SET_SELECTED_MEMBERS', payload: string | null };
-
-// Define reducer function
-const selectedMembersReducer = (state: string | null, action: ActionType): string | null => {
-  switch (action.type) {
-    case 'SET_SELECTED_MEMBERS':
-      return action.payload;
-    default:
-      return state;
-  }
-};
-
-interface SelectedMembersContextProps {
-  selectedMembers: string | null;
-  dispatch: React.Dispatch<ActionType>;
+// Define the shape of the member data including the teamId and teamColor
+export interface MemberData {
+    userId: string;
+    name: string;
+    dateCreated: string | Date;
+    callSign: string;
+    status: string;
+    user_type: string;
+    longitude: number;
+    latitude: number;
+    password: string;
+    teamId: string; // Add teamId to the MemberData interface
+    teamColor: string; // Add teamColor to the MemberData interface
 }
 
-const SelectedMembersContext = createContext<SelectedMembersContextProps | undefined>(undefined);
+interface MembersContextValue {
+    members: MemberData[];
+    setMembers: React.Dispatch<React.SetStateAction<MemberData[]>>;
+}
 
-export const SelectedMembersProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [selectedMembers, dispatch] = useReducer(selectedMembersReducer, null);
+// Provide a default value
+const MembersContext = createContext<MembersContextValue | undefined>(undefined);
 
-  return (
-    <SelectedMembersContext.Provider value={{ selectedMembers, dispatch }}>
-      {children}
-    </SelectedMembersContext.Provider>
-  );
+interface MembersProviderProps {
+    children: ReactNode;
+}
+
+export const MembersProvider: React.FC<MembersProviderProps> = ({ children }) => {
+    const [members, setMembers] = useState<MemberData[]>([]);
+
+    return (
+        <MembersContext.Provider value={{ members, setMembers }}>
+            {children}
+        </MembersContext.Provider>
+    );
 };
 
-export const useSelectedMembers = () => {
-  const context = useContext(SelectedMembersContext);
-  if (!context) {
-    throw new Error('useSelectedMembers must be used within a SelectedMembersProvider');
-  }
-  return context;
+export const useMembersContext = (): MembersContextValue => {
+    const context = useContext(MembersContext);
+    if (!context) {
+        throw new Error('useMembersContext must be used within a MembersProvider');
+    }
+    return context;
 };

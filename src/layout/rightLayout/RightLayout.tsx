@@ -5,7 +5,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleRight } from '@fortawesome/free-solid-svg-icons';
 import TeamList from '../../components/TeamList';
 
-
 export const IsRightLayoutNarrowedContext = createContext(false);
 
 interface RightLayoutProps {
@@ -25,7 +24,8 @@ const RightLayout: React.FC<RightLayoutProps> = ({ children }) => {
 
   return (
     <div
-      className={`third-section bg-gray-300 w-${isNarrowed ? '16' : '80'} ml-8 bottom-0 min-h-full z-1 right-0 absolute  transition-width flex justify-center items-center max-h-[96vh] text-alternate-text duration-100 ease-in-out overflow-${isNarrowed ? 'hidden' : 'visible'} ${isNarrowed ? 'w-10' : 'auto'} ${isNarrowed ? 'h-auto' : 'h-full'} flex flex-col`}
+      className={`third-section bg-gray-300 w-${isNarrowed ? '16' : '80'} ml-8 bottom-0 min-h-full z-1 right-0 absolute transition-width flex justify-center items-center max-h-[96vh] text-alternate-text duration-100 ease-in-out ${isNarrowed ? 'w-10' : 'auto'} ${isNarrowed ? 'h-auto' : 'h-full'} flex flex-col`}
+      style={{ maxHeight: '96vh' }} // Set max height here
     >
       <div>
         <button
@@ -39,14 +39,14 @@ const RightLayout: React.FC<RightLayoutProps> = ({ children }) => {
 
       {isNarrowed && (
         <IsRightLayoutNarrowedContext.Provider value={isNarrowed}>
-          <div className="ml-4 ">
+          <div className="mr-10 top-0">
             <TeamList displayIconsOnly={true} />
           </div>
         </IsRightLayoutNarrowedContext.Provider>
       )}
 
       {!isNarrowed && (
-        <div className='absolute top-0 pt-3'>
+        <div className='absolute top-0 pt-3 '>
           <IsRightLayoutNarrowedContext.Provider value={isNarrowed}>
             {children}
           </IsRightLayoutNarrowedContext.Provider>

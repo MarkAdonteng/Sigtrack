@@ -1,15 +1,15 @@
 // MainSectionContent.js
 
-import React from 'react';
+import React, {useState} from 'react';
 import GoogleMapComponent from '../../components/GoogleMap';
-import EsriMap from '../../components/EsriMap';
+
 
 
 function MainSectionContent() {
 
   return (
     <div>
-      <GoogleMapComponent/>
+      <GoogleMapComponent />
       {/* <EsriMap/> */}
     </div>
   );

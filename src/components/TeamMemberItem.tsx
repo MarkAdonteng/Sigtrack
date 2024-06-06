@@ -28,7 +28,7 @@ const TeamMemberItem: React.FC<TeamMemberItemProps> = ({
   };
 
   return (
-    <div className="flex items-center mb-4" onClick={handleClick}>
+    <div className="flex items-center mb-4 relative" onClick={handleClick}>
       <div
         style={{ backgroundColor: teamColor }}
         className="text-white rounded-md p-2 w-8 h-8 mr-2 flex items-center justify-center font-lato cursor-pointer"
@@ -43,7 +43,7 @@ const TeamMemberItem: React.FC<TeamMemberItemProps> = ({
         >
           {member.name}
         </div>
-        <div className="flex items-center absolute space-x-2 ml-36 mt-1">
+        <div className="flex items-center absolute space-x-2 ml-32 mt-1">
           <RiPencilFill
             className="text-primary cursor-pointer text-gray-500"
             onClick={() => onEditModalOpen(member)} // Call onEditModalOpen with member data

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import ModalForm from './ModalForm';
 
 interface AddTeamModalProps {
   isOpen: boolean;
@@ -33,15 +34,14 @@ const AddTeamModal: React.FC<AddTeamModalProps> = ({ isOpen, onClose, onSubmit }
   };
 
   return (
-    <div className='fixed  bg-gray-200 text-black w-96 rounded-lg shadow-md p-6 text-sm font-lato'>
-    <div className={`modal ${isOpen ? 'is-active' : ''}`}>
-      <div className="modal-background" onClick={onClose}></div>
-      <div className="modal-card">
-        <header className="modal-card-head">
-          <p className="modal-card-title text-center" >Enter Team Details</p>
-        </header>
-        <section className="modal-card-body">
-          <div className="field flex flex-col space-y-1 mb-4">
+    <div>
+      <ModalForm
+       isOpen={isOpen}
+       onClose={onClose}
+       onSubmit={handleSubmit}
+       title="Enter Team Details">
+
+<div className="field flex flex-col space-y-1 mb-4">
             <label className="label">Team Name:</label>
             <input
               className="input bg-gray-100 text-gray-800 border-0 rounded-md p-2 mb-4 focus:bg-gray-200 transition ease-in-out duration-150"
@@ -73,7 +73,7 @@ const AddTeamModal: React.FC<AddTeamModalProps> = ({ isOpen, onClose, onSubmit }
               onChange={(e) => setUserEnteredColor(e.target.value)}
             />
           </div>
-          
+
           <div className="field flex flex-col space-y-1 mb-4">
             <label className="label">Description:</label>
             <textarea
@@ -82,17 +82,8 @@ const AddTeamModal: React.FC<AddTeamModalProps> = ({ isOpen, onClose, onSubmit }
               onChange={(e) => setUserEnteredDescription(e.target.value)}
             />
           </div>
-        </section>
-        <footer className="modal-card-foot text-center">
-          <button className="button is-success w-20 h-10 rounded-md  bg-white text-black font-bold mt-6 mr-10 hover:bg-gray-300" onClick={handleSubmit}>
-            Save
-          </button>
-          <button className="button button is-success w-20 h-10 rounded-md  bg-white text-black  font-bold mt-6 hover:bg-gray-300" onClick={onClose}>
-            Cancel
-          </button>
-        </footer>
-      </div>
-    </div>
+      </ModalForm>
+
     </div>
   );
 };
