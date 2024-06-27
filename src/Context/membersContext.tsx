@@ -1,19 +1,7 @@
+import { Timestamp } from 'firebase/firestore';
 import React, { createContext, useContext, useState, ReactNode } from 'react';
+import { MemberData } from '../components/TeamList';
 
-// Define the shape of the member data including the teamId and teamColor
-export interface MemberData {
-    userId: string;
-    name: string;
-    dateCreated: string | Date;
-    callSign: string;
-    status: string;
-    user_type: string;
-    longitude: number;
-    latitude: number;
-    password: string;
-    teamId: string; // Add teamId to the MemberData interface
-    teamColor: string; // Add teamColor to the MemberData interface
-}
 
 interface MembersContextValue {
     members: MemberData[];

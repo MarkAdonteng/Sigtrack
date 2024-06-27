@@ -7,7 +7,7 @@ interface TeamItemProps {
   team: Team;
   onEdit: (teamId: string) => void;
   onDelete: (teamId: string) => void;
-  onTeamClick: (members: DocumentReference[], teamId: string) => void;
+  onTeamClick: ( teamId: string) => void;
   displayIconsOnly?: boolean;
   style?: React.CSSProperties;
 }
@@ -33,7 +33,7 @@ const TeamItem: React.FC<TeamItemProps> = ({
 
   const handleClick = () => {
     setIsClicked(!isClicked);
-    onTeamClick(team.members, team.id);
+    onTeamClick( team.id);
   };
 
   const renderTeamName = () => {

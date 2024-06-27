@@ -1,52 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import { useTeamId } from '../Context/TeamIdContext';
 import { db } from '../services/firebase'; // Adjust the import path as necessary
-import { doc, getDoc, onSnapshot, DocumentReference } from 'firebase/firestore';
+import { doc, onSnapshot } from 'firebase/firestore';
 import TeamDataDisplay from './TeamManager'; // Import the new component
 import AddMembersButton from './AddMembersButton';
 import { useTeamsContext } from '../Context/TeamsContext';
 import { MemberData } from '../components/TeamList';
 import { FIREBASE } from '../constants/firebase';
 import { useMembersContext } from '../Context/membersContext';
-
-const formatDate = (date: any): string => {
-    if (date instanceof Date) {
-        return date.toLocaleDateString();
-    } else if (typeof date === 'string') {
-        const parsedDate = new Date(date);
-        if (!isNaN(parsedDate.getTime())) {
-            return parsedDate.toLocaleDateString();
-        }
-    } else if (date && date.seconds) {
-        const timestampDate = new Date(date.seconds * 1000);
-        return timestampDate.toLocaleDateString();
-    }
-    return '';
-};
-
-export interface MemberFeatures {
-    userId: string,
-    name: string,
-    dateCreated: string | Date;
-    callSign: string;
-    status: string;
-    user_type: string;
-    longitude: number;
-    latitude: number;
-    password: string;
-}
+import { useTeamMembersContext } from '../Context/TeamMembersContext';
 
 const TeamData = () => {
     const { teamId } = useTeamId();
-    const [teamDataArray, setTeamDataArray] = useState<{ teamName: string, members: MemberFeatures[], teamColor: string }[]>([]);
+    const [teamDataArray, setTeamDataArray] = useState<{ teamId: string, teamName: string, members: MemberData[], teamColor: string }[]>([]);
     const { setTeamNames } = useTeamsContext();
-    const { setMembers } = useMembersContext(); 
+    const { setMembers } = useMembersContext();
+    const { teamMembers } = useTeamMembersContext(); // Context for team members
 
     useEffect(() => {
         const storedTeamData = localStorage.getItem('teamDataArray');
         if (storedTeamData) {
             const parsedTeamData = JSON.parse(storedTeamData) || [];
-            setTeamDataArray(parsedTeamData.filter((team: { removed?: boolean }) => !team.removed));// Filter out removed teams
+            setTeamDataArray(parsedTeamData.filter((team: { removed?: boolean }) => !team.removed)); // Filter out removed teams
         }
     }, []);
 
@@ -68,46 +43,17 @@ const TeamData = () => {
                 const newTeamData = {
                     teamName: teamData.name || 'Unnamed Team',
                     members: [],
-                    teamColor: teamData.color || 'No Color'
+                    teamColor: teamData.color || 'No Color',
+                    teamId: teamData.id
                 };
 
-                // Fetch members data
-                const membersPromises = teamData.members.map(async (memberRef: DocumentReference) => {
-                    console.log('Fetching member data for ID:', memberRef.id); // Log the member ID
-                    const memberDoc = await getDoc(memberRef);
-                    if (memberDoc.exists()) {
-                        const memberData = memberDoc.data();
-                        console.log('Member Data:', memberData); // Log the member data
-                        const userDocRef = doc(db, 'users', memberRef.id); // Adjust the path as necessary
-                        const userDoc = await getDoc(userDocRef);
-                        if (userDoc.exists()) {
-                            const userData = userDoc.data();
-                            console.log('User Data:', userData); // Log the user data
-                            const dateCreated = formatDate(userData.dateCreated);
-                           
-                            return {
-                                userId: memberRef.id,
-                                name: memberData.name || 'Unnamed Member',
-                                dateCreated,
-                                callSign: memberData.callSign || '',
-                                status: memberData.status || '',
-                                user_type: memberData.user_type || '',
-                                longitude: memberData.longitude || 0,
-                                latitude: memberData.latitude || 0,
-                                password: memberData.password || ''
-                            };
-                        } else {
-                            console.warn('User document does not exist for member ID:', memberRef.id);
-                            return null;
-                        }
-                    } else {
-                        console.warn('Member document does not exist for ID:', memberRef.id);
-                        return null;
-                    }
+                // Replace fetching members from Firestore with context data
+                const membersData: MemberData[] = teamMembers.filter(member => {
+                    // Assuming `member.userId` matches with `teamData.members`
+                    return teamData.members.some((memberRef: { id: string }) => memberRef.id === member.userId);
                 });
 
-                const membersData: MemberData[] = await Promise.all(membersPromises);
-                newTeamData.members = membersData.filter((member): member is MemberData => member !== null);
+                newTeamData.members = membersData;
 
                 // Update state with new team data, removing the old one if it exists
                 setTeamDataArray(prevTeamDataArray => {
@@ -121,12 +67,15 @@ const TeamData = () => {
                             // Remove the existing team data and do not add the new one
                             const filteredTeamDataArray = prevTeamDataArray.filter(team => team.teamName !== newTeamData.teamName);
                             console.log('Filtered Team Data Array (removing existing):', filteredTeamDataArray); // Log filtered team data array
+                            localStorage.setItem('teamDataArray', JSON.stringify(filteredTeamDataArray));
                             return filteredTeamDataArray;
                         }
+
                     } else {
                         // Add the new team data to the array
                         const newArray = [...prevTeamDataArray, newTeamData];
                         console.log('New Team Data Array (adding new):', newArray); // Log new team data array
+                        localStorage.setItem('teamDataArray', JSON.stringify(newArray));
                         return newArray;
                     }
                 });
@@ -136,25 +85,28 @@ const TeamData = () => {
         });
 
         return () => unsubscribe();
-    }, [teamId, setTeamNames]);
+    }, [teamId, setTeamNames, teamMembers]);
 
     useEffect(() => {
-        const names = teamDataArray.map(team => team.teamName);
-        setTeamNames(names);
+        const teamNamesWithIds = teamDataArray.map(team => ({
+            teamName: team.teamName,
+            teamId: team.teamId
+        }));
+     
+        setTeamNames(teamNamesWithIds);
+        console.log(teamId, teamNamesWithIds)
     }, [teamDataArray, setTeamNames]);
+    
 
     useEffect(() => {
         teamDataArray.forEach(team => {
             console.log(`Members of ${team.teamName}:`, team.members);
         });
-        const allMembersWithTeamColor = teamDataArray.flatMap(team => 
-            team.members.map(member => ({ ...member, teamId: team.teamName, teamColor: team.teamColor }))
+        const allMembersWithTeamColor = teamDataArray.flatMap(team =>
+            team.members.map(member => ({ ...member, teamId: team.teamId, teamColor: team.teamColor }))
         );
         setMembers(allMembersWithTeamColor); // Update the members context with all members and their teamColor
     }, [teamDataArray, setMembers]);
-    
-
-
 
     const handleAddMembers = async () => {
         // Add any necessary logic here if needed
@@ -164,11 +116,11 @@ const TeamData = () => {
         <div className='fixed top-4 -ml-32 h-full overflow-hidden'>
             <div className='overflow-y-auto overflow-x-hidden' style={{ maxHeight: 'calc(91vh - 0rem)', width: '110%' }}>
                 <div className='space-y-4'>
-                    {teamDataArray.map((teamData, index) => (
+                    {teamDataArray.map((teamData) => (
                         <TeamDataDisplay
                             key={teamData.teamName}
                             teamData={teamData}
-                            setTeamDataArray={setTeamDataArray} // Pass setTeamDataArray as a prop
+                            setTeamDataArray={setTeamDataArray}
                         />
                     ))}
                 </div>

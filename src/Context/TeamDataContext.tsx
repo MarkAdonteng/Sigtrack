@@ -74,12 +74,19 @@ export const TeamDataProvider: React.FC<TeamDataProviderProps> = ({ children }) 
     useEffect(() => {
         const storedData = localStorage.getItem('teamDataArray');
         if (storedData) {
-            dispatch({ type: actionTypes.SET_TEAM_DATA, payload: JSON.parse(storedData) });
+            try {
+                const parsedData = JSON.parse(storedData);
+                dispatch({ type: actionTypes.SET_TEAM_DATA, payload: parsedData });
+            } catch (error) {
+                console.error("Failed to parse stored team data:", error);
+            }
         }
     }, []);
 
     useEffect(() => {
-        localStorage.setItem('teamDataArray', JSON.stringify(state.teamDataArray));
+        if (state.teamDataArray) {
+            localStorage.setItem('teamDataArray', JSON.stringify(state.teamDataArray));
+        }
     }, [state.teamDataArray]);
 
     return (

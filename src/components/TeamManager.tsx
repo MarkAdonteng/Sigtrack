@@ -1,39 +1,38 @@
 import React, { useState } from 'react';
 import { RiPencilFill, RiDeleteBin6Line } from 'react-icons/ri';
 import EditMemberModal from './EditMemberModal';
-import { db } from '../services/firebase';
-import { collection, doc, deleteDoc, updateDoc } from 'firebase/firestore';
 import { useLoading } from '../Context/LoadingContext';
-
-interface MemberData {
-  name: string;
-  dateCreated: string | Date;
-  userId: string;
-  callSign: string;
-  status: string;
-  user_type: string;
-  latitude: number;
-  longitude: number;
-  password: string;
-}
+import { deleteUser } from '../repo/userRepo/deleteUser';
+import { db } from '../services/firebase';
+import { doc, updateDoc } from 'firebase/firestore';
+import { FIREBASE } from '../constants/firebase';
+import { MemberData } from './TeamList';
+import { useUserNames } from '../Context/UserNameContext';
 
 interface MemberFeatures extends MemberData {}
 
 interface TeamDataProps {
   teamName: string;
   teamColor: string;
+  teamId: string;
   members: MemberFeatures[];
 }
 
-const TeamDataDisplay: React.FC<{ teamData: TeamDataProps, setTeamDataArray: React.Dispatch<React.SetStateAction<{ teamName: string, members: MemberFeatures[], teamColor: string }[]>> }> = ({ teamData, setTeamDataArray }) => {
+const TeamDataDisplay: React.FC<{
+  teamData: TeamDataProps;
+  setTeamDataArray: React.Dispatch<React.SetStateAction<TeamDataProps[]>>;
+}> = ({ teamData, setTeamDataArray }) => {
   const [showConfirmDeleteForm, setShowConfirmDeleteForm] = useState(false);
   const [confirmDeleteFormData, setConfirmDeleteFormData] = useState<MemberData | null>(null);
   const [editedMember, setEditedMember] = useState<MemberData | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const { isLoading, setLoading } = useLoading();
+  const { getUserName } = useUserNames();
 
   const onUserClick = (userId: string) => {
     console.log('Edit clicked for user ID:', userId);
+    const name = getUserName(userId);
+    console.log('User name:', name);
   };
 
   const handleDeleteClick = (userId: string) => {
@@ -49,19 +48,22 @@ const TeamDataDisplay: React.FC<{ teamData: TeamDataProps, setTeamDataArray: Rea
       setLoading(true);
       if (confirmDeleteFormData) {
         const userId = confirmDeleteFormData.userId;
+        const teamId = teamData.teamId;
         console.log('Deleting member with userId:', userId);
-        await deleteDoc(doc(collection(db, 'users'), userId));
-        
-        setTeamDataArray(prevTeamDataArray =>
-          prevTeamDataArray.map(teamData => {
-            if (teamData.members.some(member => member.userId === userId)) {
-              const updatedMembers = teamData.members.filter(member => member.userId !== userId);
-              return { ...teamData, members: updatedMembers };
+
+        await deleteUser(teamId, userId);
+
+        setTeamDataArray(prevTeamDataArray => {
+          const updatedArray = prevTeamDataArray.map(team => {
+            if (team.teamId === teamId) {
+              const updatedMembers = team.members.filter(member => member.userId !== userId);
+              return { ...team, members: updatedMembers };
             }
-            return teamData;
-          })
-        );
-  
+            return team;
+          });
+          return updatedArray;
+        });
+
         setShowConfirmDeleteForm(false);
         setConfirmDeleteFormData(null);
       }
@@ -91,25 +93,22 @@ const TeamDataDisplay: React.FC<{ teamData: TeamDataProps, setTeamDataArray: Rea
   };
 
   const handleEditFormSubmit = async (updatedValues: Partial<MemberData>) => {
-    if (updatedValues.dateCreated && typeof updatedValues.dateCreated === 'string') {
-      updatedValues.dateCreated = new Date(updatedValues.dateCreated);
-    }
     try {
       setLoading(true);
       if (editedMember) {
         const userId = editedMember.userId;
-        const memberDoc = doc(collection(db, 'users'), userId);
+        const memberDoc = doc(db, `${FIREBASE.TEAMS}/${teamData.teamId}/${FIREBASE.MEMBERS}/${userId}`);
         await updateDoc(memberDoc, updatedValues);
-        
+
         setTeamDataArray(prevTeamDataArray =>
-          prevTeamDataArray.map(teamData => {
-            if (teamData.members.some(member => member.userId === userId)) {
-              const updatedMembers = teamData.members.map(member =>
+          prevTeamDataArray.map(team => {
+            if (team.teamId === teamData.teamId) {
+              const updatedMembers = team.members.map(member =>
                 member.userId === userId ? { ...member, ...updatedValues } : member
               );
-              return { ...teamData, members: updatedMembers };
+              return { ...team, members: updatedMembers };
             }
-            return teamData;
+            return team;
           })
         );
 
@@ -122,55 +121,58 @@ const TeamDataDisplay: React.FC<{ teamData: TeamDataProps, setTeamDataArray: Rea
     }
   };
 
-  const renderTeamName = () => {
-    if (teamData.teamName.length > 20) {
-      return (
-        <div
-          className="overflow-hidden whitespace-nowrap text-sm font-bold text-alternate-text team-name"
-          style={{ maxWidth: '120px' }}
-          title={teamData.teamName}
-        >
-          {teamData.teamName.slice(0, 20)}...
-        </div>
-      );
+  const renderMemberDetails = (member: MemberFeatures) => {
+    const memberName = getUserName(member.userId);
+    let dateAdded;
+    try {
+      if (member.dateAdded instanceof Date) {
+        dateAdded = member.dateAdded.toLocaleDateString();
+    } else if (member.dateAdded && member.dateAdded.toDate) {
+        dateAdded = member.dateAdded.toDate().toLocaleDateString();
     } else {
-      return (
-        <div
-          className="overflow-hidden whitespace-nowrap text-lg font-bold text-alternate-text team-name"
-        >
-          {teamData.teamName}
-        </div>
-      );
+        dateAdded = new Date(member.dateAdded).toLocaleDateString();
     }
+    } catch (error) {
+      console.error('Error parsing date:', error);
+      dateAdded = 'Invalid date';
+    }
+    return (
+      <div className="cursor-pointer w-36 overflow-hidden whitespace-nowrap items-center" title={`${memberName} (${member.callSign})`} onClick={() => onUserClick(member.userId)}>
+        <div>{memberName}</div>
+        <div className='text-xs'>CallSign: {member.callSign}</div>
+        <div className="text-xs text-gray-500">{dateAdded}</div>
+      </div>
+    );
   };
+  
 
-  const renderMemberName = (name: string) => {
-    if (name.length > 15) {
-      return `${name.slice(0, 15)}...`;
-    } else {
-      return name;
-    }
+  const renderTeamName = () => {
+    const { teamName, teamColor } = teamData;
+    const truncatedName = teamName.length > 20 ? `${teamName.slice(0, 20)}...` : teamName;
+
+    return (
+      <div className="overflow-hidden whitespace-nowrap text-lg font-bold text-alternate-text team-name" style={{ maxWidth: '120px' }} title={teamName}>
+        {truncatedName}
+      </div>
+    );
   };
 
   return (
-    <div>
-
-       <h1>{renderTeamName()}</h1>
-       <ul>
+    <div className="mb-4">
+      <div className="flex items-center justify-between mb-2">
+        {renderTeamName()}
+      </div>
+      <ul>
         {teamData.members.map((member) => (
-          <li key={member.userId} className="flex items-center font-lato">
+          <li key={member.userId} className="flex items-center font-lato mb-2">
             <div
               style={{ backgroundColor: teamData.teamColor }}
-              className="text-white rounded-md p-2 w-8 h-8 mr-2 flex items-center justify-center font-lato cursor-pointer"
+              className="text-white rounded-md p-2 w-10 h-10 mr-2 flex items-center justify-center font-lato cursor-pointer"
               onClick={() => onUserClick(member.userId)}
             >
-              {member.name.charAt(0)}
+              {getUserName(member.userId).charAt(0)} {/* Display first character of memberName */}
             </div>
-            <div className='cursor-pointer w-36 overflow-hidden whitespace-nowrap  items-center' title={member.name} onClick={() => onUserClick(member.userId)}>
-            {renderMemberName(member.name)}
-              <br />
-              <div className="text-xs text-gray-500">{new Date(member.dateCreated).toLocaleDateString()}</div>
-            </div>
+            {renderMemberDetails(member)}
             <div className="flex items-center relative space-x-2 ml-6 mt-1">
               <RiPencilFill
                 className="text-primary cursor-pointer text-gray-500"
@@ -198,7 +200,7 @@ const TeamDataDisplay: React.FC<{ teamData: TeamDataProps, setTeamDataArray: Rea
         <div className="fixed inset-0 bg-gray-900 text-black bg-opacity-50 flex justify-center items-center z-20 text-sm">
           <div className="bg-gray-200 text-black w-96 text-center rounded-lg shadow-md p-6 text-sm">
             <h2 className="text-lg font-semibold mb-2">
-              Are you sure you want to delete {confirmDeleteFormData?.name}?
+              Are you sure you want to delete {confirmDeleteFormData?.callSign}?
             </h2>
             <button
               onClick={handleConfirmDelete}

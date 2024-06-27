@@ -1,28 +1,28 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 interface ModalFormProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (formData: { name: string; latitude: string; longitude: string; description: string }) => void;
+  onSubmit: (formData: { title: string; latitude: string; longitude: string; desc: string }) => void;
   title: string;
   formData: {
-    name: string;
+    title: string;
     latitude: string;
     longitude: string;
-    description: string;
+    desc: string;
   };
   setFormData: React.Dispatch<React.SetStateAction<{
-    name: string;
+    title: string;
     latitude: string;
     longitude: string;
-    description: string;
+    desc: string;
   }>>;
 }
 
 const CustomMarkerModal: React.FC<ModalFormProps> = ({ isOpen, onClose, onSubmit, title, formData, setFormData }) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({
+    setFormData(prevData => ({
       ...prevData,
       [name]: value,
     }));
@@ -42,7 +42,7 @@ const CustomMarkerModal: React.FC<ModalFormProps> = ({ isOpen, onClose, onSubmit
     >
       <div
         className="modal"
-        onClick={(e) => e.stopPropagation()}
+        onClick={e => e.stopPropagation()}
       >
         <div className="modal-content bg-gray-200 text-black w-96 rounded-lg shadow-md p-6 text-sm">
           <h2 className="text-center">{title}</h2>
@@ -50,8 +50,8 @@ const CustomMarkerModal: React.FC<ModalFormProps> = ({ isOpen, onClose, onSubmit
             <label className="block">Name</label>
             <input
               type="text"
-              name="name"
-              value={formData.name}
+              name="title"
+              value={formData.title}
               onChange={handleChange}
               className="w-full p-2 border border-gray-300 rounded-md"
             />
@@ -79,8 +79,8 @@ const CustomMarkerModal: React.FC<ModalFormProps> = ({ isOpen, onClose, onSubmit
           <div className="mt-4">
             <label className="block">Description</label>
             <textarea
-              name="description"
-              value={formData.description}
+              name="desc"
+              value={formData.desc}
               onChange={handleChange}
               className="w-full p-2 border border-gray-300 rounded-md"
             ></textarea>

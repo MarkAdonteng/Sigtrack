@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useMarkerContext } from '../Context/SelectedCustomMarkeContext';
 import { useCustomMarkerContext } from '../Context/CustomMarkerContext';
 
-// Define the types for the directory and file objects
 interface FileObject {
     name: string;
     url: string;
@@ -21,7 +20,7 @@ const CustomMarkers: React.FC<CustomMarkersProps> = ({ onSelectImage }) => {
     const [directories, setDirectories] = useState<DirectoryObject[]>([]);
     const [selectedDirectory, setSelectedDirectory] = useState<string | null>(null);
     const [selectedMarker, setSelectedMarker] = useState<string | null>(null);
-    const { setSelectedMarker: setContextSelectedMarker } = useMarkerContext();
+    const { setSelectedMarker: setContextSelectedMarker, setClickedMarkerPath } = useMarkerContext();
     const { selectedImages, setSelectedImages } = useCustomMarkerContext();
 
     useEffect(() => {
@@ -37,7 +36,6 @@ const CustomMarkers: React.FC<CustomMarkersProps> = ({ onSelectImage }) => {
             const data = await response.json();
             console.log('Fetched data:', data);
 
-            // Convert the response to the DirectoryObject format
             const directories = Object.entries(data).map(([dirName, files]) => ({
                 name: dirName,
                 files: (files as string[]).map(file => ({
@@ -65,9 +63,14 @@ const CustomMarkers: React.FC<CustomMarkersProps> = ({ onSelectImage }) => {
         setContextSelectedMarker(fileUrl);
         setSelectedImages([fileUrl]);
         onSelectImage(fileUrl);
-        
-        // Log the name of the clicked marker
-        console.log('Clicked marker name:', fileName);
+
+        // Find the selected directory to log its path
+        const selectedDir = directories.find(dir => dir.name === selectedDirectory);
+        if (selectedDir) {
+            const directoryPath = selectedDir.name ? `${selectedDir.name}/` : '/';
+            setClickedMarkerPath(directoryPath + fileName); // Update the context with the clicked marker path
+            console.log('Clicked marker path:', directoryPath + fileName);
+        }
     };
 
     return (

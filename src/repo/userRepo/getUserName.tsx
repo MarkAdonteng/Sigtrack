@@ -2,12 +2,12 @@ import { collection, getDocs, QueryDocumentSnapshot } from 'firebase/firestore';
 import db from '../../services/Firestore'; // Adjust the import path as needed
 import { FIREBASE } from '../../constants/firebase';
 
-interface UserNameData {
+export interface UserNameData {
   userId: string;
-  name: string; // Update the type based on your actual data structure
+  name: string;
 }
 
-const getUserName = async (): Promise<UserNameData[]> => {
+const getUserNames = async (): Promise<UserNameData[]> => {
   try {
     const usersCollection = collection(db,FIREBASE.USERS);
     const querySnapshot = await getDocs(usersCollection);
@@ -26,4 +26,4 @@ const getUserName = async (): Promise<UserNameData[]> => {
   }
 };
 
-export { getUserName };
+export { getUserNames };

@@ -7,7 +7,7 @@ interface OrganizationData {
   organizationName: string;
 }
 
-const getOrganizations = async (): Promise<OrganizationData[]> => {
+const getUserOrganizations = async (): Promise<OrganizationData[]> => {
   try {
     const usersCollection = collection(db, FIREBASE.USERS);
     const querySnapshot = await getDocs(usersCollection);
@@ -41,4 +41,4 @@ const getOrganizations = async (): Promise<OrganizationData[]> => {
   }
 };
 
-export { getOrganizations };
+export { getUserOrganizations };

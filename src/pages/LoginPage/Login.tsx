@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { getPasswords } from '../../repo/passwordRepo/getPassword';
-import { getOrganizations } from '../../repo/organizationRepo/getOrganization';
+import { getUserOrganizations } from '../../repo/organizationRepo/getUserOrganizations';
 import { getUserStatus } from '../../repo/statusRepo/getUserStatus';
 import { useOrganizationContext } from '../../Context/organizationContext';
-import { getUserName } from '../../repo/userRepo/getUserName'; // Adjust the import path as needed
+import { getUserNames } from '../../repo/userRepo/getUserName'; // Adjust the import path as needed
 import { useUserContext } from '../../Context/LoggedInUserContext';
 
 interface LoginPageProps {
@@ -36,7 +36,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
       setLoading(true);
       setEnteredOrganization(organization);
   
-      const organizationsData = await getOrganizations();
+      const organizationsData = await getUserOrganizations();
       const passwordsData = await getPasswords();
       const statusData = await getUserStatus();
   
@@ -59,8 +59,8 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
               onLogin();
   
               setUserId(userId);
-              // Call getUserName to fetch user data
-              const userNameData = await getUserName();
+              // Call getUserNames to fetch user data
+              const userNameData = await getUserNames();
   
               // Find the user data based on the logged-in user ID
               const loggedInUserData = userNameData.find(user => user.userId === userId);

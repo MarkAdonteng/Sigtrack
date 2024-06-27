@@ -20,6 +20,8 @@ import { CustomMarkerProvider } from './Context/CustomMarkerContext';
 import { LoadingProvider } from './Context/LoadingContext';
 import { TeamDataProvider } from './Context/TeamDataContext';
 import { MembersProvider } from './Context/membersContext';
+import { TeamDataIdProvider } from './Context/TeamDataId';
+import { UserNameProvider } from './Context/UserNameContext';
 
 const SigApp: React.FC = () => {
   const [isLoggedIn, setLoggedIn] = useState(false);
@@ -82,6 +84,8 @@ const SigApp: React.FC = () => {
                   <MarkerContextProvider>
                     <TeamsProvider>
                       <TeamDataProvider>
+                        <TeamDataIdProvider>
+                          <UserNameProvider>
                     <div>
                       {/* Conditional rendering */}
                       {isLoggedIn ? (
@@ -113,6 +117,8 @@ const SigApp: React.FC = () => {
                         )
                       )}
                     </div>
+                    </UserNameProvider>
+                    </TeamDataIdProvider>
                     </TeamDataProvider>
                     </TeamsProvider>
                     </MarkerContextProvider>

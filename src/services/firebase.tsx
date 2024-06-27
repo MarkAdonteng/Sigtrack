@@ -5,12 +5,13 @@ import { getAuth } from 'firebase/auth'; // Import the authentication module
 import { getStorage } from 'firebase/storage';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDG_zCv2vlbPgPR9-Sih93Oejqnw9wBwSo",
-  authDomain: "sigtrackweb.firebaseapp.com",
-  projectId: "sigtrackweb",
-  storageBucket: "sigtrackweb.appspot.com",
-  messagingSenderId: "253377488323",
-  appId: "1:253377488323:web:97405a14d27d51efae0976"
+  apiKey: "AIzaSyDkH3rGQ0UoH2a_fNFO7HaP2oOpazyH7rU",
+  authDomain: "fieldcom-8159b.firebaseapp.com",
+  projectId: "fieldcom-8159b",
+  storageBucket: "fieldcom-8159b.appspot.com",
+  messagingSenderId: "548978360911",
+  appId: "1:548978360911:web:ce8e6102b0543beedc203a",
+  measurementId: "G-GFP3QED5E7"
 };
 
 const app = initializeApp(firebaseConfig);
