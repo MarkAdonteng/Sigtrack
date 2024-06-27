@@ -13,7 +13,7 @@ interface DirectoryObject {
 }
 
 interface CustomMarkersProps {
-    onSelectImage: (url: string) => void;
+    onSelectImage: (url: string | null) => void;
 }
 
 const CustomMarkers: React.FC<CustomMarkersProps> = ({ onSelectImage }) => {
@@ -59,17 +59,28 @@ const CustomMarkers: React.FC<CustomMarkersProps> = ({ onSelectImage }) => {
     };
 
     const handleImageClick = (fileUrl: string, fileName: string) => {
-        setSelectedMarker(fileUrl);
-        setContextSelectedMarker(fileUrl);
-        setSelectedImages([fileUrl]);
-        onSelectImage(fileUrl);
+        if (selectedMarker === fileUrl) {
+            // Deselect the image if it's already selected
+            setSelectedMarker(null);
+            setContextSelectedMarker(null);
+            setSelectedImages([]);
+            onSelectImage(null);
+            setClickedMarkerPath('');
+            console.log('Deselected marker');
+        } else {
+            // Select the image if it's not already selected
+            setSelectedMarker(fileUrl);
+            setContextSelectedMarker(fileUrl);
+            setSelectedImages([fileUrl]);
+            onSelectImage(fileUrl);
 
-        // Find the selected directory to log its path
-        const selectedDir = directories.find(dir => dir.name === selectedDirectory);
-        if (selectedDir) {
-            const directoryPath = selectedDir.name ? `${selectedDir.name}/` : '/';
-            setClickedMarkerPath(directoryPath + fileName); // Update the context with the clicked marker path
-            console.log('Clicked marker path:', directoryPath + fileName);
+            // Find the selected directory to log its path
+            const selectedDir = directories.find(dir => dir.name === selectedDirectory);
+            if (selectedDir) {
+                const directoryPath = selectedDir.name ? `${selectedDir.name}/` : '/';
+                setClickedMarkerPath(directoryPath + fileName);
+                console.log('Clicked marker path:', directoryPath + fileName);
+            }
         }
     };
 

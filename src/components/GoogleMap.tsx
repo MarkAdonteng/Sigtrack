@@ -6,7 +6,7 @@ import { useMarkerContext } from '../Context/SelectedCustomMarkeContext';
 import { useMembersContext, MemberData } from '../Context/membersContext';
 import CustomMarkerModal from './CustomMarkerModal';
 import { db } from '../services/firebase';
-import { collection, addDoc, onSnapshot } from 'firebase/firestore';
+import { collection, addDoc, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 import { v4 as uuidv4 } from 'uuid';
 
 const containerStyle: React.CSSProperties = {
@@ -61,17 +61,19 @@ const GoogleMapComponent: React.FC = () => {
     const unsubscribe = onSnapshot(markersCollection, (snapshot) => {
       const markers = snapshot.docs.map((doc) => {
         const data = doc.data();
+        console.log("Data from Firestore: ", data);
         return {
           id: doc.id,
           position: {
             lat: data.latlng.latitude,
-            lng: data.latlng.longitude
+            lng: data.latlng.longitude,
           },
           markerUrl: data.symbolPath,
           name: data.title,
           description: data.desc,
         };
       }) as DroppedMarker[];
+      console.log("Updated Markers: ", markers);
       setDroppedMarkers(markers);
     });
 
@@ -141,6 +143,16 @@ const GoogleMapComponent: React.FC = () => {
     setModalOpen(false);
   };
 
+  const handleDeleteMarker = async (markerId: string) => {
+    try {
+      await deleteDoc(doc(db, 'Symbols', markerId));
+      console.log('Marker deleted with ID:', markerId);
+      setSelectedMarkerInfo(null);
+    } catch (error) {
+      console.error('Error deleting document:', error);
+    }
+  };
+
   const handleDroppedMarkerClick = (marker: DroppedMarker) => {
     setSelectedMarkerInfo(marker);
   };
@@ -207,6 +219,7 @@ const GoogleMapComponent: React.FC = () => {
                     <h3>{marker.name}</h3>
                     <p>Latitude: {marker.position.lat.toFixed(6)}</p>
                     <p>Longitude: {marker.position.lng.toFixed(6)}</p>
+                    <button onClick={() => handleDeleteMarker(marker.id)}>Delete</button>
                   </div>
                 </InfoWindow>
               )}
@@ -225,21 +238,6 @@ const GoogleMapComponent: React.FC = () => {
               }}
             /> 
           )}
-          {/* {members.map((member) => (
-            <Marker
-              key={member.userId}
-              position={{ lat: member.latitude, lng: member.longitude }}
-              onClick={() => handleMarkerClick(member)}
-              icon={{
-                path: google.maps.SymbolPath.CIRCLE,
-                scale: 10,
-                fillColor: member.teamColor,
-                fillOpacity: 1,
-                strokeColor: '#ffffff',
-                strokeWeight: 2,
-              }}
-            />
-          ))} */}
           {selectedMember && (
             <InfoWindow
               position={{
@@ -249,40 +247,43 @@ const GoogleMapComponent: React.FC = () => {
               onCloseClick={() => setSelectedMember(null)}
             >
               <div>
-                <h3>
-                  <strong>Name: </strong>
-                  {selectedMember.name}
-                </h3>
-                <p>
-                  <strong>User ID: </strong>
-                  {selectedMember.userId}
-                </p>
-                <div>
-                  <strong>Status:</strong> {selectedMember.status}
-                </div>
-              </div>
-            </InfoWindow>
-          )}
-          <div className="bg-white">
-            <div
-              onClick={handleGoToCurrentLocation}
-              className="fixed p-1 text-green left-96 ml-[1032px] mt-96 top-28 bg-white w-10 text-center pointer"
-            >
-              <FontAwesomeIcon icon={faMapMarkerAlt} size="2x" />
-            </div>
-          </div>
-        </GoogleMap>
-      </div>
-      <CustomMarkerModal
-        isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
-        onSubmit={handleModalSubmit}
-        title="Add Marker"
-        formData={formData}
-        setFormData={setFormData}
-      />
-    </LoadScript>
-  );
+              <h3>
+  <strong>Name: </strong>
+  {selectedMember.name}
+</h3>
+<p>
+  <strong>User ID: </strong>
+  {selectedMember.userId}
+</p>
+<div>
+  <strong>Status:</strong> {selectedMember.status}
+</div>
+</div>
+</InfoWindow>
+)}
+
+<div className="bg-white">
+  <div
+    onClick={handleGoToCurrentLocation}
+    className="fixed p-1 text-green left-96 ml-[1032px] mt-96 top-28 bg-white w-10 text-center pointer"
+  >
+    <FontAwesomeIcon icon={faMapMarkerAlt} size="2x" />
+  </div>
+</div>
+</GoogleMap>
+</div>
+<CustomMarkerModal
+  isOpen={modalOpen}
+  onClose={() => setModalOpen(false)}
+  onSubmit={handleModalSubmit}
+  title="Add Marker"
+  formData={formData}
+  setFormData={setFormData}
+/>
+</LoadScript>
+);
 };
 
 export default GoogleMapComponent;
+
+                 
