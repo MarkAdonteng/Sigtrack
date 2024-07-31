@@ -41,7 +41,7 @@ import MainProject from './modules/MainProject/mainProject';
 
 function App() {
   return (
-    <div className="App">
+    <div className="Aphp">
       <MainProject/>
       <ExternalModule />
     </div>
