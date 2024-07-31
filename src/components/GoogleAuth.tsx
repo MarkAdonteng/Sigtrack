@@ -40,7 +40,7 @@ const GoogleAuth: React.FC<GoogleAuthProps> = ({ onGoogleLogin }) => {
       <button
             onClick={handleGoogleLogin}
 
-            className="flex items-center justify-center py-2 px-20  mt-16 bg-white hover:bg-gray-200 ml-0 h-14 focus:ring-offset-blue-200 text-gray-700  transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-2xl"
+            className="flex items-center justify-center py-2 px-20 mt-16 bg-white hover:bg-gray-200 ml-0 h-14 focus:ring-offset-blue-200 text-gray-700  transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-2xl"
           >
             <svg
               viewBox="0 0 24 24"

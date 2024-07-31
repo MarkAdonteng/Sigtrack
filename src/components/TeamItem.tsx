@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { RiPencilFill, RiDeleteBin6Line } from 'react-icons/ri';
 import { DocumentReference } from 'firebase/firestore';
-import { Team } from '../components/TeamList';
+import { Team } from '../constants/types';
 
 interface TeamItemProps {
   team: Team;

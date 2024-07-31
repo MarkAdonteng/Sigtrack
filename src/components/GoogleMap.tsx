@@ -3,11 +3,13 @@ import { GoogleMap, LoadScript, Marker, InfoWindow } from '@react-google-maps/ap
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons';
 import { useMarkerContext } from '../Context/SelectedCustomMarkeContext';
-import { useMembersContext, MemberData } from '../Context/membersContext';
+import { useMembersContext} from '../Context/membersContext';
+import { MemberData } from '../constants/types';
 import CustomMarkerModal from './CustomMarkerModal';
 import { db } from '../services/firebase';
 import { collection, addDoc, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 import { v4 as uuidv4 } from 'uuid';
+import { DroppedMarker } from '../constants/types';
 
 const containerStyle: React.CSSProperties = {
   position: 'absolute',
@@ -22,14 +24,6 @@ enum MapType {
   SATELLITE = 'satellite',
   HYBRID = 'hybrid',
   TERRAIN = 'terrain',
-}
-
-interface DroppedMarker {
-  id: string;
-  position: { lat: number; lng: number };
-  markerUrl: string;
-  name?: string;
-  description?: string;
 }
 
 const GoogleMapComponent: React.FC = () => {
@@ -249,7 +243,7 @@ const GoogleMapComponent: React.FC = () => {
               <div>
               <h3>
   <strong>Name: </strong>
-  {selectedMember.name}
+  {selectedMember.callSign}
 </h3>
 <p>
   <strong>User ID: </strong>

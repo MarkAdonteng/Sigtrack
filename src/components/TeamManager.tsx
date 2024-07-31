@@ -6,7 +6,7 @@ import { deleteUser } from '../repo/userRepo/deleteUser';
 import { db } from '../services/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
 import { FIREBASE } from '../constants/firebase';
-import { MemberData } from './TeamList';
+import { MemberData } from '../constants/types';
 import { useUserNames } from '../Context/UserNameContext';
 
 interface MemberFeatures extends MemberData {}

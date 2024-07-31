@@ -1,18 +1,7 @@
 import { collection, CollectionReference, getDocs, Timestamp } from 'firebase/firestore';
 import db from '../../services/Firestore';
 import { FIREBASE } from '../../constants/firebase';
-
-export interface Team {
-  id: string;
-  name: string;
-  date_established: Timestamp;
-  color?: string;
-  status: 'active' | 'suspended';
-  description: string;
-  members: CollectionReference[];
-  timestamp: number; // Add timestamp for caching
-  organization?: string;
-}
+import { Team } from '../../constants/types';
 
 const getAllTeams = async (): Promise<Team[]> => {
   try {

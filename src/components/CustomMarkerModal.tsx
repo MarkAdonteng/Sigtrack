@@ -1,25 +1,7 @@
 import React from 'react';
+import { CustomMarkerModalFormProps } from '../constants/types';
 
-interface ModalFormProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSubmit: (formData: { title: string; latitude: string; longitude: string; desc: string }) => void;
-  title: string;
-  formData: {
-    title: string;
-    latitude: string;
-    longitude: string;
-    desc: string;
-  };
-  setFormData: React.Dispatch<React.SetStateAction<{
-    title: string;
-    latitude: string;
-    longitude: string;
-    desc: string;
-  }>>;
-}
-
-const CustomMarkerModal: React.FC<ModalFormProps> = ({ isOpen, onClose, onSubmit, title, formData, setFormData }) => {
+const CustomMarkerModal: React.FC<CustomMarkerModalFormProps> = ({ isOpen, onClose, onSubmit, title, formData, setFormData }) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prevData => ({

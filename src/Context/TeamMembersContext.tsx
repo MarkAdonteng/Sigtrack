@@ -1,6 +1,6 @@
 // src/Context/TeamMembersContext.ts
 import React, { createContext, useState, useContext, ReactNode, Dispatch, SetStateAction } from 'react';
-import { MemberData } from '../components/TeamList'; // Adjust the import path as per your file structure
+import { MemberData } from '../constants/types'; // Adjust the import path as per your file structure
 
 interface TeamMembersContextProps {
   teamMembers: MemberData[];

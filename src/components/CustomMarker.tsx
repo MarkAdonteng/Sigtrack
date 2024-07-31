@@ -2,17 +2,17 @@ import React, { useEffect, useState } from 'react';
 import { useMarkerContext } from '../Context/SelectedCustomMarkeContext';
 import { useCustomMarkerContext } from '../Context/CustomMarkerContext';
 
-interface FileObject {
+export interface FileObject {
     name: string;
     url: string;
 }
 
-interface DirectoryObject {
+export interface DirectoryObject {
     name: string;
     files: FileObject[];
 }
 
-interface CustomMarkersProps {
+export interface CustomMarkersProps {
     onSelectImage: (url: string | null) => void;
 }
 

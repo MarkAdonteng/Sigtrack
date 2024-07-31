@@ -5,7 +5,7 @@ import { doc, onSnapshot } from 'firebase/firestore';
 import TeamDataDisplay from './TeamManager'; // Import the new component
 import AddMembersButton from './AddMembersButton';
 import { useTeamsContext } from '../Context/TeamsContext';
-import { MemberData } from '../components/TeamList';
+import { MemberData } from '../constants/types';
 import { FIREBASE } from '../constants/firebase';
 import { useMembersContext } from '../Context/membersContext';
 import { useTeamMembersContext } from '../Context/TeamMembersContext';

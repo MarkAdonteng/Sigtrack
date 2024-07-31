@@ -10,24 +10,11 @@ import { FIREBASE } from '../constants/firebase';
 import { getUserNames, UserNameData } from '../repo/userRepo/getUserName'; // Adjust the import path as needed
 import { addUser } from '../repo/teamsRepo/addUserToTeam'; // Adjust the import path as needed
 import { getAllTeams } from '../repo/teamsRepo/getAllTeams'; // Import the getAllTeams function
-import { MemberData } from './TeamList';
+import { MemberData } from '../constants/types';
+import { Member } from '../constants/types';
+import { AddMembersProps } from '../constants/types';
 
-export interface AddMembersProps {
-  onAddMembers: () => Promise<void>;
-  teamId: string;
-  teamDataArray: { teamId: string, teamName: string, members: MemberData[], teamColor: string }[];
-  setTeamDataArray: React.Dispatch<React.SetStateAction<{ teamId: string, teamName: string, members: MemberData[], teamColor: string }[]>>;
-}
 
-export interface Member {
-  userId: string;
-  callSign: string;
-  name: string;
-  dateAdded: Timestamp; // Change this to Firestore Timestamp
-  status: string;
-  organization?: string;
-  teamId: string;
-}
 
 const AddMembersButton: React.FC<AddMembersProps> = ({ onAddMembers, teamId, teamDataArray, setTeamDataArray }) => {
   const { enteredOrganization } = useOrganizationContext();

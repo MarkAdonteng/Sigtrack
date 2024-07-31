@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useReducer } from 'react';
-import { collection, onSnapshot, getDoc, updateDoc, deleteDoc, DocumentReference, doc, addDoc, Timestamp, CollectionReference } from 'firebase/firestore';
+import { deleteDoc, doc, Timestamp, } from 'firebase/firestore';
 import db from '../services/Firestore';
 import { useNarrowContext } from '../Context/NarrowedContext';
 import AddTeamModal from './AddTeamModal';
@@ -12,23 +12,11 @@ import { useLoading } from '../Context/LoadingContext';
 import { useTeamsContext } from '../Context/TeamsContext';
 import { FIREBASE } from '../constants/firebase';
 import { getAllTeams } from '../repo/teamsRepo/getAllTeams';
-import { getAllOrganizations } from '../repo/organizationRepo/getAllOrganizations';
 import { EditTeam } from '../repo/teamsRepo/editTeam';
 import { addTeam } from '../repo/teamsRepo/addTeam';
 import { getTeamUsers } from '../repo/userRepo/getTeamUsers';
-
-
-export interface Team {
-  id: string;
-  name: string;
-  date_established: Timestamp;
-  color?: string;
-  status: 'active' | 'suspended';
-  description: string;
-  members: CollectionReference[];
-  timestamp: number; // Add timestamp for caching
-  organization?: string;
-}
+import { Team } from '../constants/types';
+import { MemberData } from '../constants/types';
 
 interface OrganizationDocument {
   name: string;
@@ -37,14 +25,6 @@ interface OrganizationDocument {
 
 interface TeamListProps {
   displayIconsOnly?: boolean; // Boolean prop to control the display of icons only
-}
-
-export interface MemberData {
-  dateAdded: Timestamp;
-  userId: string;
-  callSign: string;
-  status: string;
-
 }
 
 

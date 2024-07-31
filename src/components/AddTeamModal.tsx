@@ -1,16 +1,6 @@
 import React, { useState } from 'react';
 import ModalForm from './ModalForm';
-
-interface AddTeamModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSubmit: (formData: {
-    newTeamName: string;
-    userEnteredStatus: string;
-    userEnteredColor: string;
-    userEnteredDescription: string;
-  }) => void;
-}
+import { AddTeamModalProps } from '../constants/types';
 
 const AddTeamModal: React.FC<AddTeamModalProps> = ({ isOpen, onClose, onSubmit }) => {
   const [newTeamName, setNewTeamName] = useState('');

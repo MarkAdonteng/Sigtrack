@@ -1,6 +1,6 @@
 import { Timestamp } from 'firebase/firestore';
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { MemberData } from '../components/TeamList';
+import { MemberData } from '../constants/types';
 
 
 interface MembersContextValue {

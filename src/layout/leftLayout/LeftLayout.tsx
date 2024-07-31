@@ -17,8 +17,7 @@ const LeftLayout: React.FC<LeftLayoutProps> = ({ className}) => {
     <div  className={`left-layout flex flex-row ${className}`}>
      
         <FirstSection>
-            <FirstSectionContent
-            onLogout={ handleLogout}/>
+            <FirstSectionContent onLogout={ handleLogout}/>
         </FirstSection>
 
        <SecondSection>

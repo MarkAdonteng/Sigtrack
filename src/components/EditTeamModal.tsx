@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Team } from './TeamList';
+import { Team } from '../constants/types';
 import ModalForm from './ModalForm';
 
 const EditTeamModal: React.FC<{

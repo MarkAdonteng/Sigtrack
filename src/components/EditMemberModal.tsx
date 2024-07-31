@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import ModalForm from './ModalForm';
-import { MemberFeatures } from './TeamData';
+import { MemberFeatures } from '../constants/types';
 import { useLoading } from '../Context/LoadingContext';
-import { MemberData } from './TeamList';
+import { MemberData } from '../constants/types';
 
 const EditMemberModal: React.FC<{
   isOpen: boolean;
